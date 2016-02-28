@@ -26,7 +26,7 @@ import java.net.URISyntaxException;
 public final class DesktopHelper {
 
 	private DesktopHelper() {
-	};
+	}
 
 	public static void openFileWithDesktopApp(final File cropDestinationFile)
 			throws IOException {

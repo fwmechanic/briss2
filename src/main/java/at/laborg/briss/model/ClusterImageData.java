@@ -47,7 +47,7 @@ public class ClusterImageData {
 	}
 
 	private void add(final BufferedImage image) {
-		int[] tmp = null;
+		int[] tmp = null; // redundant param to disambiguate getPixel() call
 		int height = image.getHeight();
 		int width = image.getWidth();
 		for (int i = 0; i < width; ++i) {

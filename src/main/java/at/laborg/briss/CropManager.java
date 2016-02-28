@@ -58,15 +58,14 @@ public class CropManager {
 	}
 
 	public static CropJob createCropJob(File source) throws IOException {
-		CropJob result = null;
 		if (source != null && source.exists()) {
 			PdfReader reader = new PdfReader(source.getAbsolutePath());
-			result = new CropJob(source, reader.getNumberOfPages(), reader
+			CropJob result = new CropJob(source, reader.getNumberOfPages(), reader
 					.getInfo(), SimpleBookmark.getBookmark(reader));
 			reader.close();
 			return result;
 		}
-		return result;
+		return null;
 	}
 
 	public static void crop(CropJob cropJob) throws IOException,

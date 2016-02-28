@@ -9,7 +9,7 @@ import at.laborg.briss.utils.BrissFileHandling;
 public final class AutoCropTest {
 
 	private AutoCropTest() {
-	};
+	}
 
 	/**
 	 * @param args

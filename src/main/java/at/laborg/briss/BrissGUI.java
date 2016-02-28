@@ -360,11 +360,10 @@ public class BrissGUI extends JFrame implements ActionListener,
 	}
 
 	private static PageExcludes getExcludedPages() {
-		boolean inputIsValid = false;
 		String previousInput = "";
 
 		// repeat show_dialog until valid input or canceled
-		while (!inputIsValid) {
+		while (true) {
 			String input = JOptionPane.showInputDialog(
 					EXCLUDE_PAGES_DESCRIPTION, previousInput);
 			previousInput = input;
@@ -380,9 +379,7 @@ public class BrissGUI extends JFrame implements ActionListener,
 				JOptionPane.showMessageDialog(null, e.getMessage(),
 						"Input Error", JOptionPane.ERROR_MESSAGE);
 			}
-
 		}
-		return null;
 	}
 
 	private File getCropFileDestination(File sourceFile) {

@@ -28,7 +28,7 @@ public final class PageNumberParser {
 
 	
 	private PageNumberParser() {
-	};
+	}
 
 	/**
 	 * Super simple page-number parser. It handles entries like: "1-2;34;3-16"

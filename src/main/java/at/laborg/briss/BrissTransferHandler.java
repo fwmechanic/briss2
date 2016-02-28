@@ -40,9 +40,7 @@ final class BrissTransferHandler extends TransferHandler {
 
 	@Override
 	public boolean canImport(final TransferSupport support) {
-		if (!support.isDataFlavorSupported(DataFlavor.stringFlavor))
-			return false;
-		return true;
+		return support.isDataFlavorSupported(DataFlavor.stringFlavor);
 
 	}
 

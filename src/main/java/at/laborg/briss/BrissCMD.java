@@ -38,7 +38,7 @@ import com.itextpdf.text.DocumentException;
 public final class BrissCMD {
 
 	private BrissCMD() {
-	};
+	}
 
 	public static void autoCrop(final String[] args) {
 
