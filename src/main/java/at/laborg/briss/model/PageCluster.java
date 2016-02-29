@@ -109,6 +109,9 @@ public class PageCluster implements Comparable<PageCluster> {
 		return evenPage;
 	}
 
+	public final int getPageHeight() { return pageHeight; }
+	public final int getPageWidth() { return pageWidth; }
+
 	public final int getRoundedPageHeight() {
 		int tmp = pageHeight / MERGE_VARIABILITY;
 		return tmp * MERGE_VARIABILITY;

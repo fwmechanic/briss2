@@ -592,8 +592,8 @@ public class BrissGUI extends JFrame implements ActionListener,
 		// maximize to width
 		// search for maximum width
 		int maxWidth = -1;
-		for (MergedPanel panel : mergedPanels) {
-			int panelMaxWidth = panel.getWidestSelectedRect();
+		for (MergedPanel mp : mergedPanels) {
+			int panelMaxWidth = mp.getWidestSelectedRect();
 			if (maxWidth < panelMaxWidth) {
 				maxWidth = panelMaxWidth;
 			}
@@ -714,8 +714,7 @@ public class BrissGUI extends JFrame implements ActionListener,
 		h = Math.round(h * 72f / 25.4f);
 
 		for (MergedPanel mp : mergedPanels) {
-			mp.setSelCropWidth(w);
-			mp.setSelCropHeight(h);
+			mp.setSelCropSize(w,h);
 		}
 	}
 
