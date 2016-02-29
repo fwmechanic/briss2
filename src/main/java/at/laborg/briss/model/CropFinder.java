@@ -53,7 +53,7 @@ public final class CropFinder {
 		if (axis == X_AXIS) {
 			double[] values = new double[raster.getWidth()];
 			for (int i = 0; i < raster.getWidth(); i++) {
-				int[] tmp = null;
+				int[] tmp = null; // redundant param to disambiguate getPixels() call
 				tmp = raster.getPixels(i, 0, 1, raster.getHeight(), tmp);
 				for (int element : tmp) {
 					values[i] += element;
@@ -64,7 +64,7 @@ public final class CropFinder {
 		} else if (axis == Y_AXIS) {
 			double[] values = new double[raster.getHeight()];
 			for (int i = 0; i < raster.getHeight(); i++) {
-				int[] tmp = null;
+				int[] tmp = null; // redundant param to disambiguate getPixels() call
 				tmp = raster.getPixels(0, i, raster.getWidth(), 1, tmp);
 				for (int element : tmp) {
 					values[i] += element;

@@ -52,8 +52,7 @@ public class ClusterImageData {
 		int width = image.getWidth();
 		for (int i = 0; i < width; ++i) {
 			for (int j = 0; j < height; ++j) {
-				imgdata[i][j][imageCnt] = (short) image.getRaster().getPixel(i,
-						j, tmp)[0];
+				imgdata[i][j][imageCnt] = (short) image.getRaster().getPixel(i, j, tmp)[0];
 			}
 		}
 		imageCnt++;

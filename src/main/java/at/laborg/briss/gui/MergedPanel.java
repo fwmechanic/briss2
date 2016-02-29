@@ -1,7 +1,8 @@
 // $Id$
 /**
  * Copyright 2010, 2011 Gerhard Aigner, Rastislav Wartiak
- * 
+ * Copyright 2016 Kevin Goodwin
+ *
  * This file is part of BRISS.
  * 
  * BRISS is free software: you can redistribute it and/or modify it under the
@@ -63,7 +64,7 @@ public class MergedPanel extends JPanel {
 	private static Point relativeHotCornerGrabDistance;
 	private static ActionState actionState = ActionState.NOTHING;
 
-	private final static int SELECT_BORDER_WIDTH = 1;
+	private final static int SELECT_BORDER_WIDTH = 2; // if < 2, border is invisible!
 	private final static Font BASE_FONT = new Font(null, Font.PLAIN, 10);
 	private final static Composite SMOOTH_NORMAL = AlphaComposite.getInstance(
 			AlphaComposite.SRC_OVER, .2f);
@@ -107,6 +108,7 @@ public class MergedPanel extends JPanel {
 		setToolTipText(createInfoString(cluster));
 		addKeyListener(new MergedPanelKeyAdapter());
 		setFocusable(true);
+		requestFocusInWindow();
 		repaint();
 	}
 
@@ -125,10 +127,10 @@ public class MergedPanel extends JPanel {
 		StringBuilder sb = new StringBuilder();
 		sb.append("<html>");
 		sb.append(cluster.isEvenPage() ? "Even " : "Odd ").append("page<br>");
-		sb.append(cluster.getAllPages().size() + " pages: ");
+		sb.append(cluster.getAllPages().size()); sb.append(" pages: ");
 		int pagecounter = 0;
 		for (Integer pageNumber : cluster.getAllPages()) {
-			sb.append(pageNumber + " ");
+			sb.append(pageNumber); sb.append(" ");
 			if (pagecounter++ > 10) {
 				pagecounter = 0;
 				sb.append("<br>");
@@ -176,8 +178,7 @@ public class MergedPanel extends JPanel {
 		g2.drawString(String.valueOf(cropCnt + 1), crop.x, crop.y + crop.height);
 		int cD = DrawableCropRect.CORNER_DIMENSION;
 		g2.fillRect(crop.x, crop.y, cD, cD);
-		g2.fillRect(crop.x + crop.width - cD - 1,
-				crop.y + crop.height - cD - 1, cD, cD);
+		g2.fillRect(crop.x + crop.width - cD - 1, crop.y + crop.height - cD - 1, cD, cD);
 	}
 
 	private void drawSelectionOverlay(Graphics2D g2, DrawableCropRect crop) {
@@ -481,8 +482,8 @@ public class MergedPanel extends JPanel {
 		}
 	}
 
-	private void removeToSmallCrops() {
-		// throw away all crops which are to small
+	private void removeTooSmallCrops() {
+		// throw away all crops which are too small
 		List<Rectangle> cropsToTrash = new ArrayList<Rectangle>();
 		for (Rectangle crop : crops) {
 			if (crop.getWidth() < 2 * DrawableCropRect.CORNER_DIMENSION
@@ -494,6 +495,12 @@ public class MergedPanel extends JPanel {
 	}
 
 	private class MergedPanelKeyAdapter extends KeyAdapter {
+
+		@Override
+		public void keyTyped(KeyEvent e) {}
+
+		@Override
+		public void keyReleased(KeyEvent e) {}
 
 		@Override
 		public void keyPressed(KeyEvent e) {
@@ -749,7 +756,7 @@ public class MergedPanel extends JPanel {
 				showPopUpMenu(mE);
 			}
 			clipCropsToVisibleArea();
-			removeToSmallCrops();
+			removeTooSmallCrops();
 			updateClusterRatios(crops);
 			actionState = ActionState.NOTHING;
 			cropStartPoint = null;

@@ -1,6 +1,7 @@
 // $Id$
 /**
  * Copyright 2010, 2011 Gerhard Aigner, Rastislav Wartiak
+ * Copyright 2016 Kevin Goodwin
  * 
  * This file is part of BRISS.
  * 
@@ -208,8 +209,7 @@ public class BrissGUI extends JFrame implements ActionListener,
 		excludePagesButton = new JMenuItem(EXCLUDE_OTHER_PAGES);
 		excludePagesButton.addActionListener(this);
 		excludePagesButton.setEnabled(false);
-		excludePagesButton.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E,
-				0));
+		excludePagesButton.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, 0));
 		fileMenu.add(excludePagesButton);
 
 		showHelpButton = new JMenuItem(HELP);
@@ -231,29 +231,25 @@ public class BrissGUI extends JFrame implements ActionListener,
 		showPreviewButton = new JMenuItem(PREVIEW, KeyEvent.VK_P);
 		showPreviewButton.addActionListener(this);
 		showPreviewButton.setEnabled(false);
-		showPreviewButton.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P,
-				0));
+		showPreviewButton.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, 0));
 		actionMenu.add(showPreviewButton);
 
 		maximizeWidthButton = new JMenuItem(MAXIMIZE_WIDTH, KeyEvent.VK_W);
 		maximizeWidthButton.addActionListener(this);
 		maximizeWidthButton.setEnabled(false);
-		maximizeWidthButton.setAccelerator(KeyStroke.getKeyStroke(
-				KeyEvent.VK_W, 0));
+		maximizeWidthButton.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, 0));
 		rectangleMenu.add(maximizeWidthButton);
 
 		maximizeHeightButton = new JMenuItem(MAXIMIZE_HEIGHT, KeyEvent.VK_H);
 		maximizeHeightButton.addActionListener(this);
 		maximizeHeightButton.setEnabled(false);
-		maximizeHeightButton.setAccelerator(KeyStroke.getKeyStroke(
-				KeyEvent.VK_H, 0));
+		maximizeHeightButton.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H, 0));
 		rectangleMenu.add(maximizeHeightButton);
 
 		maximizeSizeButton = new JMenuItem(MAXIMIZE_SIZE, KeyEvent.VK_Z);
 		maximizeSizeButton.addActionListener(this);
 		maximizeSizeButton.setEnabled(false);
-		maximizeSizeButton.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M,
-				0));
+		maximizeSizeButton.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, 0));
 		rectangleMenu.add(maximizeSizeButton);
 
 		setSizeButton = new JMenuItem(SET_SIZE, KeyEvent.VK_S);
@@ -265,8 +261,7 @@ public class BrissGUI extends JFrame implements ActionListener,
 		setPositionButton = new JMenuItem(SET_POSITION, KeyEvent.VK_O);
 		setPositionButton.addActionListener(this);
 		setPositionButton.setEnabled(false);
-		setPositionButton.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O,
-				0));
+		setPositionButton.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, 0));
 		rectangleMenu.add(setPositionButton);
 
 		rectangleMenu.addSeparator();
@@ -274,15 +269,13 @@ public class BrissGUI extends JFrame implements ActionListener,
 		moveLeftButton = new JMenuItem(MOVE_LEFT, KeyEvent.VK_LEFT);
 		moveLeftButton.addActionListener(this);
 		moveLeftButton.setEnabled(false);
-		moveLeftButton.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT,
-				0));
+		moveLeftButton.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0));
 		rectangleMenu.add(moveLeftButton);
 
 		moveRightButton = new JMenuItem(MOVE_RIGHT, KeyEvent.VK_RIGHT);
 		moveRightButton.addActionListener(this);
 		moveRightButton.setEnabled(false);
-		moveRightButton.setAccelerator(KeyStroke.getKeyStroke(
-				KeyEvent.VK_RIGHT, 0));
+		moveRightButton.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0));
 		rectangleMenu.add(moveRightButton);
 
 		moveUpButton = new JMenuItem(MOVE_UP, KeyEvent.VK_UP);
@@ -294,8 +287,7 @@ public class BrissGUI extends JFrame implements ActionListener,
 		moveDownButton = new JMenuItem(MOVE_DOWN, KeyEvent.VK_DOWN);
 		moveDownButton.addActionListener(this);
 		moveDownButton.setEnabled(false);
-		moveDownButton.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN,
-				0));
+		moveDownButton.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0));
 		rectangleMenu.add(moveDownButton);
 
 		rectangleMenu.addSeparator();
@@ -303,15 +295,13 @@ public class BrissGUI extends JFrame implements ActionListener,
 		selectAllButton = new JMenuItem(SELECT_ALL, 0);
 		selectAllButton.addActionListener(this);
 		selectAllButton.setEnabled(false);
-		selectAllButton
-				.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, 0));
+		selectAllButton.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, 0));
 		rectangleMenu.add(selectAllButton);
 
 		selectNoneButton = new JMenuItem(SELECT_NONE, 0);
 		selectNoneButton.addActionListener(this);
 		selectNoneButton.setEnabled(false);
-		selectNoneButton.setAccelerator(KeyStroke
-				.getKeyStroke(KeyEvent.VK_N, 0));
+		selectNoneButton.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, 0));
 		rectangleMenu.add(selectNoneButton);
 
 		setJMenuBar(menuBar);
@@ -690,9 +680,7 @@ public class BrissGUI extends JFrame implements ActionListener,
 
 		// get user input
 		// maximums are used as a default
-		String input = JOptionPane.showInputDialog(SET_SIZE_DESCRIPTION,
-				defInput);
-
+		String input = JOptionPane.showInputDialog(SET_SIZE_DESCRIPTION, defInput);
 		if (input == null || input.equals(""))
 			return;
 
