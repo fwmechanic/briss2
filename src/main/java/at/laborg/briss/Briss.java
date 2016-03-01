@@ -48,8 +48,13 @@ public final class Briss {
 				gui = false;
 			}
 		}
-
-
+		/*
+		int ix = 0;
+		for(String a : args) {
+			System.out.println("argv["+ix+"]="+a+"'");
+			++ix;
+		}
+		*/
 		if (!gui) {
 			if(customcrop)
 				BrissCMD.customCrop(args);

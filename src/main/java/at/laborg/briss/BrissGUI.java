@@ -518,10 +518,10 @@ public class BrissGUI extends JFrame implements ActionListener,
 			setPositionSelRects();
 		} else if (action.getActionCommand().equals(SELECT_ALL)) {
 			for (MergedPanel panel : mergedPanels)
-				panel.selectCrops(true);
+				panel.selectAllCrops(true);
 		} else if (action.getActionCommand().equals(SELECT_NONE)) {
 			for (MergedPanel panel : mergedPanels)
-				panel.selectCrops(false);
+				panel.selectAllCrops(false);
 		}
 	}
 
@@ -563,8 +563,7 @@ public class BrissGUI extends JFrame implements ActionListener,
 		lastOpenDir = loadFile.getParentFile();
 		previewPanel.removeAll();
 		progressBar.setString("Loading new file - Creating merged previews");
-		ClusterPagesTask clusterTask = new ClusterPagesTask(loadFile,
-				getExcludedPages());
+		ClusterPagesTask clusterTask = new ClusterPagesTask(loadFile, getExcludedPages());
 		clusterTask.addPropertyChangeListener(this);
 		clusterTask.execute();
 	}
@@ -572,8 +571,7 @@ public class BrissGUI extends JFrame implements ActionListener,
 	private void reloadWithOtherExcludes() throws IOException, PdfException {
 		previewPanel.removeAll();
 		progressBar.setString("Reloading file - Creating merged previews");
-		ClusterPagesTask clusterTask = new ClusterPagesTask(
-				workingSet.getSourceFile(), getExcludedPages());
+		ClusterPagesTask clusterTask = new ClusterPagesTask(workingSet.getSourceFile(), getExcludedPages());
 		clusterTask.addPropertyChangeListener(this);
 		clusterTask.execute();
 	}
@@ -583,7 +581,7 @@ public class BrissGUI extends JFrame implements ActionListener,
 		// search for maximum width
 		int maxWidth = -1;
 		for (MergedPanel mp : mergedPanels) {
-			int panelMaxWidth = mp.getWidestSelectedRect();
+			int panelMaxWidth = mp.selCropsGetMaxWidth();
 			if (maxWidth < panelMaxWidth) {
 				maxWidth = panelMaxWidth;
 			}
@@ -592,7 +590,7 @@ public class BrissGUI extends JFrame implements ActionListener,
 		if (maxWidth == -1)
 			return;
 		for (MergedPanel mp : mergedPanels) {
-			mp.setSelCropWidth(maxWidth);
+			mp.selCropsSetWidth(maxWidth);
 		}
 	}
 
@@ -600,8 +598,8 @@ public class BrissGUI extends JFrame implements ActionListener,
 		// maximize to height
 		// search for maximum height
 		int maxHeight = -1;
-		for (MergedPanel panel : mergedPanels) {
-			int panelMaxHeight = panel.getHeighestSelectedRect();
+		for (MergedPanel mp : mergedPanels) {
+			int panelMaxHeight = mp.selCropsGetMaxHeight();
 			if (maxHeight < panelMaxHeight) {
 				maxHeight = panelMaxHeight;
 			}
@@ -610,7 +608,7 @@ public class BrissGUI extends JFrame implements ActionListener,
 		if (maxHeight == -1)
 			return;
 		for (MergedPanel mp : mergedPanels) {
-			mp.setSelCropHeight(maxHeight);
+			mp.selCropsSetHeight(maxHeight);
 		}
 	}
 
@@ -619,8 +617,8 @@ public class BrissGUI extends JFrame implements ActionListener,
 		// search for maximums
 		int maxWidth = -1;
 		int maxHeight = -1;
-		for (MergedPanel panel : mergedPanels) {
-			Dimension panelMaxSize = panel.getLargestRect();
+		for (MergedPanel mp : mergedPanels) {
+			Dimension panelMaxSize = mp.allCropsGetMaxSizes();
 			if (maxWidth < panelMaxSize.width) {
 				maxWidth = panelMaxSize.width;
 			}
@@ -632,15 +630,15 @@ public class BrissGUI extends JFrame implements ActionListener,
 		if ((maxWidth == -1) || (maxHeight == -1))
 			return;
 		for (MergedPanel mp : mergedPanels) {
-			mp.setAllCropSize(maxWidth, maxHeight);
+			mp.allCropsSetSize(maxWidth, maxHeight);
 		}
 	}
 
 	public void alignSelRects(int x, int y, int w, int h) {
 		// set position and size of selected rectangles
 		for (MergedPanel mp : mergedPanels) {
-			mp.setSelCropSize(w, h);
-			mp.moveToSelelectedCrops(x, y);
+			mp.selCropsSetSize(w, h);
+			mp.selCropsMoveAbsolute(x, y);
 		}
 	}
 
@@ -648,7 +646,7 @@ public class BrissGUI extends JFrame implements ActionListener,
 		// move selected rectangles
 		// parameters are relative to current position
 		for (MergedPanel mp : mergedPanels) {
-			mp.moveSelelectedCrops(x, y);
+			mp.selCropsMoveRelative(x, y);
 		}
 	}
 
@@ -661,12 +659,12 @@ public class BrissGUI extends JFrame implements ActionListener,
 		// get maximum dimensions
 		int maxWidth = -1;
 		int maxHeight = -1;
-		for (MergedPanel panel : mergedPanels) {
-			int panelMaxWidth = panel.getWidestSelectedRect();
+		for (MergedPanel mp : mergedPanels) {
+			int panelMaxWidth = mp.selCropsGetMaxWidth();
 			if (maxWidth < panelMaxWidth) {
 				maxWidth = panelMaxWidth;
 			}
-			int panelMaxHeight = panel.getHeighestSelectedRect();
+			int panelMaxHeight = mp.selCropsGetMaxHeight();
 			if (maxHeight < panelMaxHeight) {
 				maxHeight = panelMaxHeight;
 			}
@@ -702,7 +700,7 @@ public class BrissGUI extends JFrame implements ActionListener,
 		h = Math.round(h * 72f / 25.4f);
 
 		for (MergedPanel mp : mergedPanels) {
-			mp.setSelCropSize(w,h);
+			mp.selCropsSetSize(w,h);
 		}
 	}
 
@@ -715,12 +713,12 @@ public class BrissGUI extends JFrame implements ActionListener,
 		// get minimums of positions
 		int minX = Integer.MAX_VALUE;
 		int minY = Integer.MAX_VALUE;
-		for (MergedPanel panel : mergedPanels) {
-			int panelMinX = panel.getLeftmostSelectedRect();
+		for (MergedPanel mp : mergedPanels) {
+			int panelMinX = mp.selCropsGetLeftmost();
 			if (minX > panelMinX) {
 				minX = panelMinX;
 			}
-			int panelMinY = panel.getUpmostSelectedRect();
+			int panelMinY = mp.selCropsGetUpmost();
 			if (minY > panelMinY) {
 				minY = panelMinY;
 			}
@@ -757,14 +755,14 @@ public class BrissGUI extends JFrame implements ActionListener,
 		y = Math.round(y * 72f / 25.4f);
 
 		for (MergedPanel mp : mergedPanels) {
-			mp.moveToSelelectedCrops(x, y);
+			mp.selCropsMoveAbsolute(x, y);
 		}
 	}
 
-	public void resizeSelRects(int w, int h) {
+	public void resizeSelectedRects(int w, int h) {
 		// change size of selected rectangles (relative)
 		for (MergedPanel mp : mergedPanels) {
-			mp.resizeSelCrop(w, h);
+			mp.selCropsResize(w, h);
 		}
 	}
 
@@ -831,8 +829,7 @@ public class BrissGUI extends JFrame implements ActionListener,
 
 		for (PageCluster newCluster : newClusters.getClusterList()) {
 			for (Integer pageNumber : newCluster.getAllPages()) {
-				PageCluster oldCluster = oldClusters
-						.getSingleCluster(pageNumber);
+				PageCluster oldCluster = oldClusters.getSingleCluster(pageNumber);
 				for (Float[] ratios : oldCluster.getRatiosList()) {
 					newCluster.addRatios(ratios);
 				}

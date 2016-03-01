@@ -147,15 +147,13 @@ public class MergedPanel extends JPanel {
 
 	@Override
 	public void update(Graphics g) {
-		if (!isEnabled())
+		if (!isEnabled()) {
 			return;
-
+		}
 		Graphics2D g2 = (Graphics2D) g;
 		g2.drawImage(img, null, 0, 0);
-
 		// draw previously created rectangles
 		int cropCnt = 0;
-
 		for (DrawableCropRect crop : crops) {
 			drawNormalCropRectangle(g2, cropCnt, crop);
 			if (crop.isSelected()) {
@@ -163,9 +161,7 @@ public class MergedPanel extends JPanel {
 			}
 			cropCnt++;
 		}
-
 		g2.dispose();
-
 	}
 
 	private void drawNormalCropRectangle(Graphics2D g2, int cropCnt,
@@ -201,7 +197,7 @@ public class MergedPanel extends JPanel {
 							crop.y + crop.height - SELECT_BORDER_WIDTH);
 	}
 
-	private void changeSelectRectangle(Point p) {
+	private void toggleCropSelectionUnderPt(Point p) {
 		for (DrawableCropRect crop : crops) {
 			if (crop.contains(p)) {
 				crop.setSelected(!crop.isSelected());
@@ -209,10 +205,9 @@ public class MergedPanel extends JPanel {
 			}
 		}
 		repaint();
-		return;
 	}
 
-	public int getWidestSelectedRect() {
+	public int selCropsGetMaxWidth() {
 		int max = -1;
 		for (DrawableCropRect crop : crops) {
 			if (crop.isSelected()) {
@@ -224,7 +219,7 @@ public class MergedPanel extends JPanel {
 		return max;
 	}
 
-	public int getHeighestSelectedRect() {
+	public int selCropsGetMaxHeight() {
 		int max = -1;
 		for (DrawableCropRect crop : crops) {
 			if (crop.isSelected()) {
@@ -236,7 +231,7 @@ public class MergedPanel extends JPanel {
 		return max;
 	}
 
-	public int getLeftmostSelectedRect() {
+	public int selCropsGetLeftmost() {
 		int min = Integer.MAX_VALUE;
 		for (DrawableCropRect crop : crops) {
 			if (crop.isSelected()) {
@@ -248,7 +243,7 @@ public class MergedPanel extends JPanel {
 		return min;
 	}
 
-	public int getUpmostSelectedRect() {
+	public int selCropsGetUpmost() {
 		int min = Integer.MAX_VALUE;
 		for (DrawableCropRect crop : crops) {
 			if (crop.isSelected()) {
@@ -260,7 +255,7 @@ public class MergedPanel extends JPanel {
 		return min;
 	}
 
-	public Dimension getLargestRect() {
+	public Dimension allCropsGetMaxSizes() {
 		int maxW = -1;
 		int maxH = -1;
 		for (DrawableCropRect crop : crops) {
@@ -274,7 +269,7 @@ public class MergedPanel extends JPanel {
 		return new Dimension(maxW, maxH);
 	}
 
-	public void setSelCropWidth(int width) {
+	public void selCropsSetWidth(int width) {
 		for (DrawableCropRect crop : crops) {
 			if (crop.isSelected()) {
 				crop.setSize( width, crop.height );
@@ -284,7 +279,7 @@ public class MergedPanel extends JPanel {
 		repaint();
 	}
 
-	public void setSelCropHeight(int height) {
+	public void selCropsSetHeight(int height) {
 		for (DrawableCropRect crop : crops) {
 			if (crop.isSelected()) {
 				crop.setSize( crop.width, height );
@@ -294,7 +289,7 @@ public class MergedPanel extends JPanel {
 		repaint();
 	}
 
-	public void setSelCropSize(int width, int height) {
+	public void selCropsSetSize(int width, int height) {
 		for (DrawableCropRect crop : crops) {
 			if (crop.isSelected()) {
 				crop.setSize( width, height );
@@ -304,12 +299,13 @@ public class MergedPanel extends JPanel {
 		repaint();
 	}
 
-	public void resizeSelCrop(int width, int height) {
+	public void selCropsResize(int width, int height) {
 		for (DrawableCropRect crop : crops) {
 			if (crop.isSelected()) {
 				if (((width < 0) && (crop.width <= -width)) ||
-					((height < 0) && (crop.height <= -height)))
+					((height < 0) && (crop.height <= -height))) {
 					return;
+				}
 				crop.setSize(crop.width + width, crop.height + height);
 			}
 		}
@@ -317,7 +313,7 @@ public class MergedPanel extends JPanel {
 		repaint();
 	}
 
-	public void setAllCropSize(int width, int height) {
+	public void allCropsSetSize(int width, int height) {
 		for (DrawableCropRect crop : crops) {
 			crop.setSize(width, height);
 		}
@@ -325,29 +321,30 @@ public class MergedPanel extends JPanel {
 		repaint();
 	}
 
-	public void moveSelelectedCrops(int x, int y) {
+	public void selCropsMoveRelative(int x, int y) {
 		for (DrawableCropRect crop : crops) {
 			if (crop.isSelected()) {
-				int newX = crop.x + x;
-				int newY = crop.y + y;
-				crop.setLocation(newX, newY);
+				crop.translate(x, y);
 			}
 		}
+		updateClusterRatios(crops);
 		repaint();
 	}
 
-	public void moveToSelelectedCrops(int x, int y) {
+	public void selCropsMoveAbsolute(int x, int y) {
 		for (DrawableCropRect crop : crops) {
 			if (crop.isSelected()) {
 				crop.setLocation(x, y);
 			}
 		}
+		updateClusterRatios(crops);
 		repaint();
 	}
 
-	public void selectCrops(boolean select) {
-		for (DrawableCropRect crop : crops)
+	public void selectAllCrops(boolean select) {
+		for (DrawableCropRect crop : crops) {
 			crop.setSelected(select);
+		}
 		repaint();
 	}
 
@@ -366,15 +363,11 @@ public class MergedPanel extends JPanel {
 	 * 
 	 * @return the cropped ratios or null if to small
 	 */
-	private static Float[] getCutRatiosForPdf(Rectangle crop, int imgWidth,
-			int imgHeight) {
-		int x1, x2, y1, y2;
-
-		x1 = crop.x;
-		x2 = x1 + crop.width;
-		y1 = crop.y;
-		y2 = y1 + crop.height;
-
+	private static Float[] getCutRatiosForPdf(Rectangle crop, int imgWidth, int imgHeight) {
+		int x1 = crop.x;
+		int x2 = x1 + crop.width;
+		int y1 = crop.y;
+		int y2 = y1 + crop.height;
 		// check for maximum and minimum
 		if (x1 < 0) {
 			x1 = 0;
@@ -388,7 +381,6 @@ public class MergedPanel extends JPanel {
 		if (y2 > imgHeight) {
 			y2 = imgHeight;
 		}
-
 		Float[] ratios = new Float[4];
 		// left
 		ratios[0] = (float) x1 / imgWidth;
@@ -398,7 +390,6 @@ public class MergedPanel extends JPanel {
 		ratios[2] = 1 - ((float) x2 / imgWidth);
 		// top
 		ratios[3] = 1 - ((float) (imgHeight - y1) / imgHeight);
-
 		return ratios;
 	}
 
@@ -543,19 +534,19 @@ public class MergedPanel extends JPanel {
 						y *= 10;
 					}
 					if ((e.getModifiers() & InputEvent.CTRL_MASK) != 0) {
-						briss.resizeSelRects(x, y);
+						briss.resizeSelectedRects(x, y);
 					}
-					else {
+					else /* if ((e.getModifiers() & InputEvent.ALT_MASK) != 0) */ {
 						briss.moveSelectedRects(x, y);
 					}
+					e.consume(); // prevent framework from taking further action on these events
 					break;
 				default:
 			}
 		}
 	}
 
-	private class MergedPanelMouseAdapter extends MouseAdapter implements
-			ActionListener {
+	private class MergedPanelMouseAdapter extends MouseAdapter implements ActionListener {
 
 		@Override
 		public void mouseMoved(MouseEvent e) {
@@ -618,7 +609,7 @@ public class MergedPanel extends JPanel {
 				updateClusterRatios(crops);
 				repaint();
 			} else if (PopUpMenuForCropRectangles.SELECT_DESELECT.equals(e.getActionCommand())) {
-				changeSelectRectangle(popUpMenuPoint);
+				toggleCropSelectionUnderPt(popUpMenuPoint);
 			} else if (PopUpMenuForCropRectangles.COPY.equals(e.getActionCommand())) {
 				copyToClipBoard();
 			} else if (PopUpMenuForCropRectangles.PASTE.equals(e.getActionCommand())) {
@@ -663,8 +654,8 @@ public class MergedPanel extends JPanel {
 					lastDragPoint = curPoint;
 				}
 				if (mE.isShiftDown()) {
-					briss.resizeSelRects(curPoint.x - lastDragPoint.x,
-					  		    		 curPoint.y - lastDragPoint.y);
+					briss.resizeSelectedRects(curPoint.x - lastDragPoint.x,
+											  curPoint.y - lastDragPoint.y);
 				}
 				else {
 					curPoint.translate(relativeHotCornerGrabDistance.x,
@@ -678,8 +669,8 @@ public class MergedPanel extends JPanel {
 					lastDragPoint = curPoint;
 				}
 				if (mE.isShiftDown()) {
-					briss.resizeSelRects(lastDragPoint.x - curPoint.x,
-							   			 lastDragPoint.y - curPoint.y);
+					briss.resizeSelectedRects(lastDragPoint.x - curPoint.x,
+							   				  lastDragPoint.y - curPoint.y);
 					briss.moveSelectedRects(curPoint.x - lastDragPoint.x,
 										    curPoint.y - lastDragPoint.y);
 				}
@@ -703,7 +694,7 @@ public class MergedPanel extends JPanel {
 			}
 
 			if (mE.isControlDown()) {
-				changeSelectRectangle(p);
+				toggleCropSelectionUnderPt(p);
 				return;
 			}
 
