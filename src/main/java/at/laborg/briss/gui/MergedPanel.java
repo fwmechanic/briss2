@@ -327,6 +327,7 @@ public class MergedPanel extends JPanel {
 				crop.translate(x, y);
 			}
 		}
+		removeAnyCropEntirelyBeyondVisibleArea();
 		updateClusterRatios(crops);
 		repaint();
 	}
@@ -453,6 +454,34 @@ public class MergedPanel extends JPanel {
 		repaint();
 	}
 
+	private void removeAnyCropEntirelyBeyondVisibleArea() {
+		/* KG 2016/3/1 new policy here:
+			do not molest (clip) crops until they've been moved entirely out of
+			the visible area at which point they are deleted.
+			rationale:
+			 	- if a crop moves (partially) outside the visible area,
+				- user may have simply "overshot" during movement phase;
+				- let him recover via reciprocal move,
+				- but if crop sizes have been molested by the move, this becomes an onerous chore
+				- so don't molest his crops' sizes until he has "driven them off the cliff"
+		 */
+		List<Rectangle> cropsToTrash = new ArrayList<Rectangle>();
+		for (Rectangle crop : crops) {
+			int ulcX = crop.x;
+			int ulcY = crop.y;
+			int lrcX = ulcX + crop.width;
+			int lrcY = ulcY + crop.height;
+			if (	   lrcY <= 0
+					|| lrcX <= 0
+					|| ulcX >= getWidth()
+					|| ulcY >= getHeight()
+					) {
+				cropsToTrash.add(crop);
+			}
+		}
+		crops.removeAll(cropsToTrash);
+	}
+
 	private void clipCropsToVisibleArea() {
 		// clip to visible area
 		for (Rectangle crop : crops) {
@@ -477,8 +506,8 @@ public class MergedPanel extends JPanel {
 		// throw away all crops which are too small
 		List<Rectangle> cropsToTrash = new ArrayList<Rectangle>();
 		for (Rectangle crop : crops) {
-			if (crop.getWidth() < 2 * DrawableCropRect.CORNER_DIMENSION
-					|| crop.getHeight() < 2 * DrawableCropRect.CORNER_DIMENSION) {
+			if (   crop.getWidth()  < 2 * DrawableCropRect.CORNER_DIMENSION
+				|| crop.getHeight() < 2 * DrawableCropRect.CORNER_DIMENSION) {
 				cropsToTrash.add(crop);
 			}
 		}

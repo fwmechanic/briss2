@@ -1,5 +1,6 @@
 /**
  * Copyright 2010 Gerhard Aigner
+ * Copyright 2016 Kevin Goodwin
  * 
  * This file is part of BRISS.
  * 
@@ -24,14 +25,26 @@ import javax.swing.filechooser.FileFilter;
 public class PDFFileFilter extends FileFilter {
 	@Override
 	public boolean accept(File pathname) {
-		// sometimes we get null-ed file 
+		// sometimes we get null-ed file
+		// 2016/3/1 KG we sometimes get an exception _below the if's that follow_...
+		// presumably this means toString() returns null?  But this seems undocumented behavior.
+		// NB: accept() is called FOREACH file-/dir-name found in a GUI File-Open wildcard scan!
+		// maybe there is some name-encoding impedance mismatch?
 		if (pathname == null) {
 			return false; 
 		}
 		if (pathname.isDirectory()) {
 			return true;
 		}
-		return pathname.toString().toLowerCase().endsWith(".pdf");
+		String tmp = pathname.toString();	// System.out.println("pn2S="+tmp+"'");
+		if (tmp == null) {  // brute-force exception avoidance
+			return false;
+		}
+		tmp = tmp.toLowerCase();			// System.out.println("lc="+tmp+"'");
+		if (tmp == null) {  // brute-force exception avoidance
+			return false;
+		}
+		return tmp.endsWith(".pdf");
 	}
 
 	@Override
