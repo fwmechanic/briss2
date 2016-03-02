@@ -211,9 +211,7 @@ public class MergedPanel extends JPanel {
 		int max = -1;
 		for (DrawableCropRect crop : crops) {
 			if (crop.isSelected()) {
-				if (crop.width > max) {
-					max = crop.width;
-				}
+				max = Math.max(max, crop.width);
 			}
 		}
 		return max;
@@ -223,9 +221,7 @@ public class MergedPanel extends JPanel {
 		int max = -1;
 		for (DrawableCropRect crop : crops) {
 			if (crop.isSelected()) {
-				if (crop.height > max) {
-					max = crop.height;
-				}
+				max = Math.max(max, crop.height);
 			}
 		}
 		return max;
@@ -235,9 +231,7 @@ public class MergedPanel extends JPanel {
 		int min = Integer.MAX_VALUE;
 		for (DrawableCropRect crop : crops) {
 			if (crop.isSelected()) {
-				if (crop.x < min) {
-					min = crop.x;
-				}
+				min = Math.min(min, crop.x);
 			}
 		}
 		return min;
@@ -247,9 +241,7 @@ public class MergedPanel extends JPanel {
 		int min = Integer.MAX_VALUE;
 		for (DrawableCropRect crop : crops) {
 			if (crop.isSelected()) {
-				if (crop.y < min) {
-					min = crop.y;
-				}
+				min = Math.min(min, crop.y);
 			}
 		}
 		return min;
@@ -259,12 +251,8 @@ public class MergedPanel extends JPanel {
 		int maxW = -1;
 		int maxH = -1;
 		for (DrawableCropRect crop : crops) {
-			if (crop.width > maxW) {
-				maxW = crop.width;
-			}
-			if (crop.height > maxH) {
-				maxH = crop.height;
-			}
+			maxW = Math.max(maxW, crop.width);
+			maxH = Math.max(maxH, crop.height);
 		}
 		return new Dimension(maxW, maxH);
 	}
@@ -369,28 +357,17 @@ public class MergedPanel extends JPanel {
 		int x2 = x1 + crop.width;
 		int y1 = crop.y;
 		int y2 = y1 + crop.height;
-		// check for maximum and minimum
-		if (x1 < 0) {
-			x1 = 0;
-		}
-		if (x2 > imgWidth) {
-			x2 = imgWidth;
-		}
-		if (y1 < 0) {
-			y1 = 0;
-		}
-		if (y2 > imgHeight) {
-			y2 = imgHeight;
-		}
+		// constrain
+		x1 = Math.max( x1, 0 );
+		x2 = Math.min( x2, imgWidth );
+		y1 = Math.max( y1, 0 );
+		y2 = Math.min( y2, imgHeight );
+		// recalc
 		Float[] ratios = new Float[4];
-		// left
-		ratios[0] = (float) x1 / imgWidth;
-		// bottom
-		ratios[1] = (float) (imgHeight - y2) / imgHeight;
-		// right
-		ratios[2] = 1 - ((float) x2 / imgWidth);
-		// top
-		ratios[3] = 1 - ((float) (imgHeight - y1) / imgHeight);
+		ratios[0] = (float) x1 / imgWidth;  // left
+		ratios[1] = (float) (imgHeight - y2) / imgHeight;  // bottom
+		ratios[2] = 1 - ((float) x2 / imgWidth);  // right
+		ratios[3] = 1 - ((float) (imgHeight - y1) / imgHeight);  // top
 		return ratios;
 	}
 
