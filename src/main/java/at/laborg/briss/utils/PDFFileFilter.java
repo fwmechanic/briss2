@@ -26,9 +26,9 @@ public class PDFFileFilter extends FileFilter {
 	@Override
 	public boolean accept(File pathname) {
 		// sometimes we get null-ed file
-		// 2016/3/1 KG we sometimes get an exception _below the if's that follow_...
+		// 2016/3/1 KG we sometimes get an exception _below the next two if's_
 		// presumably this means toString() returns null?  But this seems undocumented behavior.
-		// NB: accept() is called FOREACH file-/dir-name found in a GUI File-Open wildcard scan!
+		// NB: accept() is called FOR EACH file-/dir-name found in a GUI File-Open wildcard scan!
 		// maybe there is some name-encoding impedance mismatch?
 		if (pathname == null) {
 			return false; 
@@ -36,14 +36,12 @@ public class PDFFileFilter extends FileFilter {
 		if (pathname.isDirectory()) {
 			return true;
 		}
-		String tmp = pathname.toString();	// System.out.println("pn2S="+tmp+"'");
+		String tmp = pathname.toString();
 		if (tmp == null) {  // brute-force exception avoidance
+			System.out.println("pn.2S=null?");
 			return false;
 		}
 		tmp = tmp.toLowerCase();			// System.out.println("lc="+tmp+"'");
-		if (tmp == null) {  // brute-force exception avoidance
-			return false;
-		}
 		return tmp.endsWith(".pdf");
 	}
 
