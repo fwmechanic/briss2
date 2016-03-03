@@ -36,13 +36,7 @@ public class PDFFileFilter extends FileFilter {
 		if (pathname.isDirectory()) {
 			return true;
 		}
-		String tmp = pathname.toString();
-		if (tmp == null) {  // brute-force exception avoidance
-			System.out.println("pn.2S=null?");
-			return false;
-		}
-		tmp = tmp.toLowerCase();			// System.out.println("lc="+tmp+"'");
-		return tmp.endsWith(".pdf");
+		return pathname.isFile() && pathname.getName().toLowerCase().endsWith(".pdf");
 	}
 
 	@Override

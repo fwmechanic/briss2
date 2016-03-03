@@ -143,8 +143,7 @@ public class BrissGUI extends JFrame implements ActionListener,
 		if (args.length == 0)
 			return;
 		File fileArg = new File(args[0]);
-		if (fileArg.exists()
-				&& fileArg.getAbsolutePath().trim().endsWith(".pdf")) {
+		if (fileArg.exists() && fileArg.getAbsolutePath().trim().endsWith(".pdf")) {
 			try {
 				importNewPdfFile(fileArg);
 			} catch (IOException e) {
@@ -155,17 +154,12 @@ public class BrissGUI extends JFrame implements ActionListener,
 						"Briss error", JOptionPane.ERROR_MESSAGE);
 			}
 		}
-
 	}
 
 	private void init() {
-
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
-
 		this.setTransferHandler(new BrissTransferHandler(this));
-
 		setUILook();
-
 		loadIcon();
 
 		// Create the menu bar.
@@ -362,9 +356,7 @@ public class BrissGUI extends JFrame implements ActionListener,
 				return null;
 
 			try {
-				PageExcludes pageExcludes = new PageExcludes(
-						PageNumberParser.parsePageNumber(input));
-				return pageExcludes;
+				return new PageExcludes(PageNumberParser.parsePageNumber(input));
 			} catch (ParseException e) {
 				JOptionPane.showMessageDialog(null, e.getMessage(),
 						"Input Error", JOptionPane.ERROR_MESSAGE);
@@ -373,29 +365,25 @@ public class BrissGUI extends JFrame implements ActionListener,
 	}
 
 	private File getCropFileDestination(File sourceFile) {
-
 		File recommendedFile = BrissFileHandling
 				.getRecommendedDestination(sourceFile);
 		JFileChooser fc = new JFileChooser(lastOpenDir);
 		fc.setSelectedFile(recommendedFile);
 		fc.setFileFilter(new PDFFileFilter());
 		int retval = fc.showSaveDialog(this);
-
-		if (retval == JFileChooser.APPROVE_OPTION)
+		if (retval == JFileChooser.APPROVE_OPTION) {
 			return fc.getSelectedFile();
-
+		}
 		return null;
 	}
 
 	private File getNewFileToCrop() {
-
 		JFileChooser fc = new JFileChooser(lastOpenDir);
 		fc.setFileFilter(new PDFFileFilter());
 		int retval = fc.showOpenDialog(this);
-
-		if (retval == JFileChooser.APPROVE_OPTION)
+		if (retval == JFileChooser.APPROVE_OPTION) {
 			return fc.getSelectedFile();
-
+		}
 		return null;
 	}
 
@@ -417,8 +405,9 @@ public class BrissGUI extends JFrame implements ActionListener,
 		} else if (action.getActionCommand().equals(MAXIMIZE_WIDTH)) {
 			maximizeWidthInSelectedRects();
 		} else if (action.getActionCommand().equals(EXCLUDE_OTHER_PAGES)) {
-			if (workingSet.getSourceFile() == null)
+			if (workingSet.getSourceFile() == null) {
 				return;
+		    }
 			setWorkingState("Exclude other pages");
 			try {
 				reloadWithOtherExcludes();
@@ -448,7 +437,6 @@ public class BrissGUI extends JFrame implements ActionListener,
 						"Error occured while loading",
 						JOptionPane.ERROR_MESSAGE);
 			}
-
 		}
 		else if (action.getActionCommand().equals(SHOW_CROP)) {
 			ClusterDefinition clusters = workingSet.getClusterDefinition();
@@ -458,7 +446,6 @@ public class BrissGUI extends JFrame implements ActionListener,
 			ClusterDefinition clusters = workingSet.getClusterDefinition();
 			String cropStr = JOptionPane.showInputDialog(this, "Crop Option: ", CropParser.cropToString (clusters.getAllRatios()));
 			List<List<Float []>> rLL = CropParser.parse(cropStr);
-
 			for (int i = 0; i < rLL.size (); i++) {
 				clusters.getClusterList ().get(i).setRatiosList(rLL.get (i));
 			}
@@ -474,7 +461,6 @@ public class BrissGUI extends JFrame implements ActionListener,
 					DesktopHelper.openFileWithDesktopApp(result);
 					lastOpenDir = result.getParentFile();
 				}
-
 			} catch (IOException e) {
 				JOptionPane.showMessageDialog(this, e.getMessage(),
 						"Error occured while cropping",
@@ -581,10 +567,7 @@ public class BrissGUI extends JFrame implements ActionListener,
 		// search for maximum width
 		int maxWidth = -1;
 		for (MergedPanel mp : mergedPanels) {
-			int panelMaxWidth = mp.selCropsGetMaxWidth();
-			if (maxWidth < panelMaxWidth) {
-				maxWidth = panelMaxWidth;
-			}
+			maxWidth = Math.max(maxWidth , mp.selCropsGetMaxWidth());
 		}
 		// set maximum width to all rectangles
 		if (maxWidth == -1)
@@ -599,10 +582,7 @@ public class BrissGUI extends JFrame implements ActionListener,
 		// search for maximum height
 		int maxHeight = -1;
 		for (MergedPanel mp : mergedPanels) {
-			int panelMaxHeight = mp.selCropsGetMaxHeight();
-			if (maxHeight < panelMaxHeight) {
-				maxHeight = panelMaxHeight;
-			}
+			maxHeight = Math.max(maxHeight, mp.selCropsGetMaxHeight());
 		}
 		// set maximum height to all rectangles
 		if (maxHeight == -1)
@@ -619,12 +599,8 @@ public class BrissGUI extends JFrame implements ActionListener,
 		int maxHeight = -1;
 		for (MergedPanel mp : mergedPanels) {
 			Dimension panelMaxSize = mp.allCropsGetMaxSizes();
-			if (maxWidth < panelMaxSize.width) {
-				maxWidth = panelMaxSize.width;
-			}
-			if (maxHeight < panelMaxSize.height) {
-				maxHeight = panelMaxSize.height;
-			}
+			maxWidth  = Math.max(maxWidth , panelMaxSize.width );
+			maxHeight = Math.max(maxHeight, panelMaxSize.height);
 		}
 		// set maximum size to all rectangles
 		if ((maxWidth == -1) || (maxHeight == -1))
@@ -653,21 +629,13 @@ public class BrissGUI extends JFrame implements ActionListener,
 	public void setDefinedSizeSelRects() {
 		// set size of selected rectangles
 		// based on user input
-
 		String defInput = "";
-
 		// get maximum dimensions
 		int maxWidth = -1;
 		int maxHeight = -1;
 		for (MergedPanel mp : mergedPanels) {
-			int panelMaxWidth = mp.selCropsGetMaxWidth();
-			if (maxWidth < panelMaxWidth) {
-				maxWidth = panelMaxWidth;
-			}
-			int panelMaxHeight = mp.selCropsGetMaxHeight();
-			if (maxHeight < panelMaxHeight) {
-				maxHeight = panelMaxHeight;
-			}
+			maxWidth  = Math.max(maxWidth , mp.selCropsGetMaxWidth() );
+			maxHeight = Math.max(maxHeight, mp.selCropsGetMaxHeight());
 		}
 		if ((maxWidth >= 0) && (maxHeight >= 0)) {
 			maxWidth = Math.round(25.4f * maxWidth / 72f);
@@ -675,17 +643,16 @@ public class BrissGUI extends JFrame implements ActionListener,
 			defInput = Integer.toString(maxWidth) + " "
 					+ Integer.toString(maxHeight);
 		}
-
 		// get user input
 		// maximums are used as a default
 		String input = JOptionPane.showInputDialog(SET_SIZE_DESCRIPTION, defInput);
-		if (input == null || input.equals(""))
+		if (input == null || input.equals("")) {
 			return;
-
+		}
 		String[] dims = input.split(" ", 2);
-		if (dims.length != 2)
+		if (dims.length != 2) {
 			return;
-
+		}
 		int w = -1;
 		int h = -1;
 		try {
@@ -694,11 +661,9 @@ public class BrissGUI extends JFrame implements ActionListener,
 		} catch (NumberFormatException e) {
 			return;
 		}
-
-		// convert from milimeters to points
+		// convert from mm to points
 		w = Math.round(w * 72f / 25.4f);
 		h = Math.round(h * 72f / 25.4f);
-
 		for (MergedPanel mp : mergedPanels) {
 			mp.selCropsSetSize(w,h);
 		}
@@ -707,40 +672,29 @@ public class BrissGUI extends JFrame implements ActionListener,
 	public void setPositionSelRects() {
 		// set position of selected rectangles
 		// based on user input
-
 		String defInput = "";
-
 		// get minimums of positions
 		int minX = Integer.MAX_VALUE;
 		int minY = Integer.MAX_VALUE;
 		for (MergedPanel mp : mergedPanels) {
-			int panelMinX = mp.selCropsGetLeftmost();
-			if (minX > panelMinX) {
-				minX = panelMinX;
-			}
-			int panelMinY = mp.selCropsGetUpmost();
-			if (minY > panelMinY) {
-				minY = panelMinY;
-			}
+			minX = Math.min(minX, mp.selCropsGetLeftmost() );
+			minY = Math.min(minY, mp.selCropsGetUpmost()   );
 		}
 		if ((minX < Integer.MAX_VALUE) && (minY < Integer.MAX_VALUE)) {
 			minX = Math.round(25.4f * minX / 72f);
 			minY = Math.round(25.4f * minY / 72f);
 			defInput = Integer.toString(minX) + " " + Integer.toString(minY);
 		}
-
 		// get user input
 		// minimums are used as a default
-		String input = JOptionPane.showInputDialog(SET_POSITION_DESCRIPTION,
-				defInput);
-
-		if (input == null || input.equals(""))
+		String input = JOptionPane.showInputDialog(SET_POSITION_DESCRIPTION, defInput);
+		if (input == null || input.equals("")) {
 			return;
-
+		}
 		String[] dims = input.split(" ", 2);
-		if (dims.length != 2)
+		if (dims.length != 2) {
 			return;
-
+		}
 		int x = -1;
 		int y = -1;
 		try {
@@ -749,11 +703,9 @@ public class BrissGUI extends JFrame implements ActionListener,
 		} catch (NumberFormatException e) {
 			return;
 		}
-
 		// convert from milimeters to points
 		x = Math.round(x * 72f / 25.4f);
 		y = Math.round(y * 72f / 25.4f);
-
 		for (MergedPanel mp : mergedPanels) {
 			mp.selCropsMoveAbsolute(x, y);
 		}
@@ -775,19 +727,17 @@ public class BrissGUI extends JFrame implements ActionListener,
 	private void createMergedPanels (boolean autoCrop) {
 		previewPanel.removeAll();
 		mergedPanels = new ArrayList<MergedPanel>();
-
 		for (PageCluster cluster : workingSet.getClusterDefinition()
 				.getClusterList()) {
-			MergedPanel p = new MergedPanel(cluster, this, autoCrop);
-			previewPanel.add(p);
-			mergedPanels.add(p);
+			MergedPanel mp = new MergedPanel(cluster, this, autoCrop);
+			previewPanel.add(mp);
+			mergedPanels.add(mp);
 		}
 		previewPanel.revalidate();
 	}
 	private void setStateAfterClusteringFinished(ClusterDefinition newClusters,
 			PageExcludes newPageExcludes, File newSource) {
 		updateWorkingSet(newClusters, newPageExcludes, newSource);
-
 		createMergedPanels (true);
 		progressBar.setString("Clustering and Rendering finished");
 		cropButton.setEnabled(true);
@@ -838,7 +788,6 @@ public class BrissGUI extends JFrame implements ActionListener,
 	}
 
 	private class ClusterPagesTask extends SwingWorker<Void, Void> {
-
 		private final File source;
 		private final PageExcludes pageExcludes;
 		private ClusterDefinition clusterDefinition = null;
@@ -851,28 +800,21 @@ public class BrissGUI extends JFrame implements ActionListener,
 
 		@Override
 		protected void done() {
-			setStateAfterClusteringFinished(clusterDefinition, pageExcludes,
-					source);
+			setStateAfterClusteringFinished(clusterDefinition, pageExcludes, source);
 		}
 
 		@Override
 		protected Void doInBackground() {
-
 			try {
-				clusterDefinition = ClusterCreator.clusterPages(source,
-						pageExcludes);
-
+				clusterDefinition = ClusterCreator.clusterPages(source, pageExcludes);
 			} catch (IOException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 				return null;
 			}
-
 			int totalWorkUnits = clusterDefinition.getNrOfPagesToRender();
-			ClusterRenderWorker renderWorker = new ClusterRenderWorker(source,
-					clusterDefinition);
+			ClusterRenderWorker renderWorker = new ClusterRenderWorker(source, clusterDefinition);
 			renderWorker.start();
-
 			while (renderWorker.isAlive()) {
 				int percent = (int) ((renderWorker.workerUnitCounter / (float) totalWorkUnits) * 100);
 				setProgress(percent);
@@ -881,7 +823,6 @@ public class BrissGUI extends JFrame implements ActionListener,
 				} catch (InterruptedException e) {
 				}
 			}
-
 			return null;
 		}
 	}

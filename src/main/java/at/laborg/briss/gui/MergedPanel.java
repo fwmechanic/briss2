@@ -693,19 +693,15 @@ public class MergedPanel extends JPanel {
 
 		@Override
 		public void mousePressed(MouseEvent mE) {
-
 			Point p = mE.getPoint();
 			if (mE.isPopupTrigger()) {
 				showPopUpMenu(mE);
 			}
-
 			if (mE.isControlDown()) {
 				toggleCropSelectionUnderPt(p);
 				return;
 			}
-
 			if (SwingUtilities.isLeftMouseButton(mE)) {
-
 				// check if any of the upper left hotcorners are used
 				for (DrawableCropRect crop : crops) {
 					if (crop.containsInHotCornerUL(p)) {
@@ -716,7 +712,6 @@ public class MergedPanel extends JPanel {
 						return;
 					}
 				}
-
 				// check if any of the lower right hotcorners are used
 				for (DrawableCropRect crop : crops) {
 					if (crop.containsInHotCornerLR(p)) {
@@ -727,7 +722,6 @@ public class MergedPanel extends JPanel {
 						return;
 					}
 				}
-
 				// check if the crop should be moved
 				for (DrawableCropRect crop : crops) {
 					if (crop.contains(p)) {
@@ -736,7 +730,6 @@ public class MergedPanel extends JPanel {
 						return;
 					}
 				}
-
 				// otherwise draw a new one
 				actionState = ActionState.DRAWING_NEW_CROP;
 				if (curCrop == null) {
@@ -804,6 +797,7 @@ public class MergedPanel extends JPanel {
 				copyItem.addActionListener(MergedPanelMouseAdapter.this);
 				copyItem.setEnabled(copyPossible);
 				add(copyItem);
+
 				JMenuItem pasteItem = new JMenuItem(PASTE);
 				pasteItem.addActionListener(MergedPanelMouseAdapter.this);
 				pasteItem.setEnabled(ClipBoard.getInstance().getAmountOfCropsInClipBoard() > 0);

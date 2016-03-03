@@ -90,15 +90,12 @@ public class PageCluster implements Comparable<PageCluster> {
 	}
 
 	public final boolean isClusterNearlyEqual(final PageCluster other) {
-		if (evenPage != other.evenPage)
-			return false;
-		if (excluded || other.excluded)
-			return false;
-		if (getRoundedPageHeight() != other.getRoundedPageHeight())
-			return false;
-		if (getRoundedPageWidth() != other.getRoundedPageWidth())
-			return false;
-		return true;
+		return evenPage == other.evenPage
+		&&	!excluded
+		&&	!other.excluded
+		&&  getRoundedPageHeight() == other.getRoundedPageHeight()
+		&&	getRoundedPageWidth()  == other.getRoundedPageWidth()
+		;
 	}
 
 	public final void mergeClusters(final PageCluster other) {

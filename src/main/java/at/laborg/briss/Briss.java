@@ -59,7 +59,7 @@ public final class Briss {
 			if(customcrop)
 				BrissCMD.customCrop(args);
 			else
-			BrissCMD.autoCrop(args);
+				BrissCMD.autoCrop(args);
 		} else {
 			new BrissGUI(args);
 		}
