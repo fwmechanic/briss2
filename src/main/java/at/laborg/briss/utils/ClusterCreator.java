@@ -35,24 +35,17 @@ public final class ClusterCreator {
 	public static ClusterDefinition clusterPages(final File source,
 			final PageExcludes pageExcludes) throws IOException {
 		PdfReader reader = new PdfReader(source.getAbsolutePath());
-
 		ClusterDefinition clusters = new ClusterDefinition();
-
-		for (int page = 1; page <= reader.getNumberOfPages(); page++) {
-
-			Rectangle layoutBox = getLayoutBox(reader, page);
-
+		for (int pgnum = 1; pgnum <= reader.getNumberOfPages(); pgnum++) {
+			Rectangle layoutBox = getLayoutBox(reader, pgnum);
 			// create Cluster
 			// if the pagenumber should be excluded then use it as a
 			// discriminating parameter, else use default value
-
 			boolean excluded = checkExclusionAndGetPageNumber(pageExcludes,
-					page);
-
-			PageCluster tmpCluster = new PageCluster(page % 2 == 0,
+					pgnum);
+			PageCluster tmpCluster = new PageCluster(pgnum % 2 == 0,
 					(int) layoutBox.getWidth(), (int) layoutBox.getHeight(),
-					excluded, page);
-
+					excluded, pgnum);
 			clusters.addOrMergeCluster(tmpCluster);
 		}
 		reader.close();
@@ -60,11 +53,10 @@ public final class ClusterCreator {
 		return clusters;
 	}
 
-	private static Rectangle getLayoutBox(final PdfReader reader, final int page) {
-		Rectangle layoutBox = reader.getBoxSize(page, "crop");
-
+	private static Rectangle getLayoutBox(final PdfReader reader, final int pgnum) {
+		Rectangle layoutBox = reader.getBoxSize(pgnum, "crop");
 		if (layoutBox == null) {
-			layoutBox = reader.getBoxSize(page, "media");
+			layoutBox = reader.getBoxSize(pgnum, "media");
 		}
 		return layoutBox;
 	}

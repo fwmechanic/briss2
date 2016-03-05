@@ -21,39 +21,50 @@ package at.laborg.briss.model;
 import java.util.ArrayList;
 import java.util.List;
 
+/*
+ A set of page(s) of similar size (and other properties), which are collectively
+ (sparsely, if necessary) rendered in order to provide a "merged" preview, a
+ single visible pageset.  What a user resizes.
+ Also (in solo-page form) used as the element by which each page of a
+ file being ingested is considered for membership in such a set.
+ */
 public class PageCluster implements Comparable<PageCluster> {
 
 	private static final int MERGE_VARIABILITY = 20;
 	private static final int MAX_MERGE_PAGES = 15;
 
-	private List<Integer> pagesToMerge;
-	private final List<Integer> allPages;
+	private final List<Integer> memberPgNums;
+	// Every memberPgNum shares the same <roundedPgWidth,roundedPgHeight> attribute.
+	// The <pageWidth,PageHeight> attribute of each memberPgNum may not be identical to those of its mates.
+	private final int roundedPgWidth;
+	private final int roundedPgHeight;
+
+	private static int roundedPgDim(int dim ) {
+		int tmp = dim / MERGE_VARIABILITY;
+		return tmp * MERGE_VARIABILITY;
+	}
+
 	private final List<Float[]> cropRatiosList = new ArrayList<Float[]>();
-
 	private boolean excluded = false;
-
 	private ClusterImageData imageData;
-
 	private final boolean evenPage;
-	private final int pageWidth;
-	private final int pageHeight;
 
 	public PageCluster(final boolean isEvenPage, final int pageWidth, final int pageHeight,
 			final boolean excluded, final int pageNumber) {
 		super();
-		this.pageWidth = pageWidth;
-		this.pageHeight = pageHeight;
+		this.roundedPgWidth  = roundedPgDim( pageWidth  );
+		this.roundedPgHeight = roundedPgDim( pageHeight );
 		this.evenPage = isEvenPage;
 		this.excluded = excluded;
-		this.pagesToMerge = new ArrayList<Integer>();
-		this.allPages = new ArrayList<Integer>();
-		this.allPages.add(pageNumber);
+		this.previewPgNums = new ArrayList<Integer>();
+		this.memberPgNums = new ArrayList<Integer>();
+		this.memberPgNums.add(pageNumber);
 	}
 
 	public final ClusterImageData getImageData() {
 		if (imageData == null) {
-			imageData = new ClusterImageData(pageWidth, pageHeight,
-					pagesToMerge.size());
+			imageData = new ClusterImageData(roundedPgWidth, roundedPgHeight,
+					previewPgNums.size());
 		}
 		return imageData;
 	}
@@ -93,68 +104,53 @@ public class PageCluster implements Comparable<PageCluster> {
 		return evenPage == other.evenPage
 		&&	!excluded
 		&&	!other.excluded
-		&&  getRoundedPageHeight() == other.getRoundedPageHeight()
-		&&	getRoundedPageWidth()  == other.getRoundedPageWidth()
+		&&  roundedPgHeight == other.roundedPgHeight
+		&&	roundedPgWidth  == other.roundedPgWidth
 		;
 	}
 
-	public final void mergeClusters(final PageCluster other) {
-		allPages.addAll(other.getAllPages());
+	public final void incorporate(final PageCluster other) {
+		memberPgNums.addAll(other.getMemberPgNums());
 	}
 
-	public final boolean isEvenPage() {
+	public final boolean isEvenPages() {
 		return evenPage;
 	}
 
-	public final int getPageHeight() { return pageHeight; }
-	public final int getPageWidth() { return pageWidth; }
-
-	public final int getRoundedPageHeight() {
-		int tmp = pageHeight / MERGE_VARIABILITY;
-		return tmp * MERGE_VARIABILITY;
-	}
-
-	public final int getRoundedPageWidth() {
-		int tmp = pageWidth / MERGE_VARIABILITY;
-		return tmp * MERGE_VARIABILITY;
-	}
-
-	public final void choosePagesToMerge() {
-		if (allPages.size() < MAX_MERGE_PAGES) {
+	private List<Integer> previewPgNums;
+	public final void designatePreviewPages() {
+		if (memberPgNums.size() < MAX_MERGE_PAGES) {
 			// use all pages
-			pagesToMerge = allPages;
+			previewPgNums = memberPgNums;
 		} else {
 			// use an equal distribution
-			float stepWidth = (float) allPages.size() / MAX_MERGE_PAGES;
+			float stepWidth = (float) memberPgNums.size() / MAX_MERGE_PAGES;
 			float totalStepped = 0;
 			for (int i = 0; i < MAX_MERGE_PAGES; i++) {
-				pagesToMerge.add(allPages.get(new Double(Math
+				previewPgNums.add(memberPgNums.get(new Double(Math
 						.floor(totalStepped)).intValue()));
 				totalStepped += stepWidth;
 			}
 		}
 	}
 
-	public final List<Integer> getAllPages() {
-		return allPages;
+	public final List<Integer> getMemberPgNums() {
+		return memberPgNums;
 	}
 
-	public final List<Integer> getPagesToMerge() {
-		return pagesToMerge;
+	public final List<Integer> getPreviewPgNums() {
+		return previewPgNums;
 	}
 
-	public final int compareTo(final PageCluster that) {
-		return this.getFirstPage() - that.getFirstPage();
-	}
-
-	private int getFirstPage() {
+	private int getMinPage() {
 		int small = Integer.MAX_VALUE;
-		for (Integer tmp : allPages) {
-			if (tmp < small) {
-				small = tmp;
-			}
+		for (Integer tmp : memberPgNums) {
+			small = Math.min(small, tmp);
 		}
 		return small;
 	}
 
+	public final int compareTo(final PageCluster that) {
+		return this.getMinPage() - that.getMinPage();
+	}
 }

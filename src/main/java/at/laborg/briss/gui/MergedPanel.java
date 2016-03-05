@@ -126,11 +126,11 @@ public class MergedPanel extends JPanel {
 	private String createInfoString(PageCluster cluster) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("<html>");
-		sb.append(cluster.isEvenPage() ? "Even " : "Odd ").append("page<br>");
-		sb.append(cluster.getAllPages().size()); sb.append(" pages: ");
+		sb.append(cluster.isEvenPages() ? "Even " : "Odd ").append("page<br>");
+		sb.append(cluster.getMemberPgNums().size()); sb.append(" pages: ");
 		int pagecounter = 0;
-		for (Integer pageNumber : cluster.getAllPages()) {
-			sb.append(pageNumber); sb.append(" ");
+		for (Integer pgNum : cluster.getMemberPgNums()) {
+			sb.append(pgNum); sb.append(" ");
 			if (pagecounter++ > 10) {
 				pagecounter = 0;
 				sb.append("<br>");

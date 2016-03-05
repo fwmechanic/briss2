@@ -143,7 +143,10 @@ public class BrissGUI extends JFrame implements ActionListener,
 		if (args.length == 0)
 			return;
 		File fileArg = new File(args[0]);
-		if (fileArg.exists() && fileArg.getAbsolutePath().trim().endsWith(".pdf")) {
+		if (fileArg.exists()
+				&& fileArg.isFile()
+				&& fileArg.getName().toLowerCase().endsWith(".pdf")
+				) {
 			try {
 				importNewPdfFile(fileArg);
 			} catch (IOException e) {
@@ -345,7 +348,6 @@ public class BrissGUI extends JFrame implements ActionListener,
 
 	private static PageExcludes getExcludedPages() {
 		String previousInput = "";
-
 		// repeat show_dialog until valid input or canceled
 		while (true) {
 			String input = JOptionPane.showInputDialog(
@@ -778,8 +780,8 @@ public class BrissGUI extends JFrame implements ActionListener,
 			ClusterDefinition newClusters) {
 
 		for (PageCluster newCluster : newClusters.getClusterList()) {
-			for (Integer pageNumber : newCluster.getAllPages()) {
-				PageCluster oldCluster = oldClusters.getSingleCluster(pageNumber);
+			for (Integer pgNum : newCluster.getMemberPgNums()) {
+				PageCluster oldCluster = oldClusters.getSingleCluster(pgNum);
 				for (Float[] ratios : oldCluster.getRatiosList()) {
 					newCluster.addRatios(ratios);
 				}

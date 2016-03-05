@@ -49,7 +49,7 @@ public final class CropDefinition {
 		HashMap<Integer, List<Float[]>> pagesToCrops = new HashMap<Integer, List<Float[]>>();
 
 		for (PageCluster cluster : clusters.getClusterList()) {
-			for (Integer pageNumber : cluster.getAllPages()) {
+			for (Integer pageNumber : cluster.getMemberPgNums()) {
 				List<Float[]> cropRectangles = pagesToCrops.get(pageNumber);
 				if (cropRectangles == null) {
 					cropRectangles = new ArrayList<Float[]>();

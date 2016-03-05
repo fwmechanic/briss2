@@ -3,7 +3,6 @@
  */
 package at.laborg.briss.utils;
 
-import java.awt.image.BufferedImage;
 import java.io.File;
 
 import org.jpedal.PdfDecoder;
@@ -33,17 +32,14 @@ public class ClusterRenderWorker extends Thread {
 		} catch (PdfException e1) {
 			e1.printStackTrace();
 		}
-
 		for (PageCluster cluster : clusters.getClusterList()) {
-			for (Integer pageNumber : cluster.getPagesToMerge()) {
+			for (Integer pgNum : cluster.getPreviewPgNums()) {
 				// TODO jpedal isn't able to render big images
 				// correctly, so let's check if the image is big an
 				// throw it away
 				try {
 					if (cluster.getImageData().isRenderable()) {
-						BufferedImage renderedPage = pdfDecoder
-								.getPageAsImage(pageNumber);
-						cluster.getImageData().addImageToPreview(renderedPage);
+						cluster.getImageData().addImageToPreview( pdfDecoder.getPageAsImage(pgNum) );
 						workerUnitCounter++;
 					}
 				} catch (PdfException e) {
@@ -51,7 +47,6 @@ public class ClusterRenderWorker extends Thread {
 					e.printStackTrace();
 				}
 			}
-
 		}
 		// now close the reader as it's not used anymore
 		pdfDecoder.closePdfFile();

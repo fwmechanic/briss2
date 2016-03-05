@@ -26,7 +26,7 @@ public class ClusterDefinition {
 
 	public final PageCluster getSingleCluster(final int pageNumber) {
 		for (PageCluster cluster : clusters) {
-			if (cluster.getAllPages().contains(pageNumber))
+			if (cluster.getMemberPgNums().contains(pageNumber))
 				return cluster;
 		}
 		return null;
@@ -47,7 +47,7 @@ public class ClusterDefinition {
 	public final void addOrMergeCluster(final PageCluster tmpCluster) {
 		PageCluster existingCluster = findNearlyEqualCluster(tmpCluster);
 		if (existingCluster != null) {
-			existingCluster.mergeClusters(tmpCluster);
+			existingCluster.incorporate(tmpCluster);
 		} else {
 			clusters.add(tmpCluster);
 		}
@@ -63,14 +63,14 @@ public class ClusterDefinition {
 
 	public final void selectAndSetPagesForMerging() {
 		for (PageCluster cluster : clusters) {
-			cluster.choosePagesToMerge();
+			cluster.designatePreviewPages();
 		}
 	}
 
 	public final int getNrOfPagesToRender() {
 		int size = 0;
 		for (PageCluster cluster : clusters) {
-			size += cluster.getPagesToMerge().size();
+			size += cluster.getPreviewPgNums().size();
 		}
 		return size;
 	}
