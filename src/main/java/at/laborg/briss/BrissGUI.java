@@ -118,12 +118,11 @@ public class BrissGUI extends JFrame implements ActionListener,
 	private static final String DONATION_URI = "http://sourceforge.net/project/project_donations.php?group_id=320676";
 	private static final String RES_ICON_PATH = "/Briss_icon_032x032.gif";
 
-	private JMenuBar menuBar;
 	private JPanel previewPanel;
 	private JProgressBar progressBar;
-	private JMenuItem loadButton, cropButton, maximizeWidthButton,
-			maximizeHeightButton, showPreviewButton, showHelpButton,
-			openDonationLinkButton, excludePagesButton;
+	private JMenuItem cropButton, maximizeWidthButton,
+			maximizeHeightButton, showPreviewButton,
+			excludePagesButton;
 	private JMenuItem maximizeSizeButton, setSizeButton, setPositionButton,
 			moveLeftButton, moveRightButton, moveUpButton, moveDownButton,
 			selectAllButton, selectNoneButton;
@@ -166,7 +165,7 @@ public class BrissGUI extends JFrame implements ActionListener,
 		loadIcon();
 
 		// Create the menu bar.
-		menuBar = new JMenuBar();
+		JMenuBar menuBar = new JMenuBar();
 		JMenu fileMenu = new JMenu("File");
 		fileMenu.setMnemonic(KeyEvent.VK_F);
 		JMenu rectangleMenu = new JMenu("Rectangle");
@@ -178,7 +177,7 @@ public class BrissGUI extends JFrame implements ActionListener,
 		menuBar.add(rectangleMenu);
 		menuBar.add(actionMenu);
 
-		loadButton = new JMenuItem(LOAD, KeyEvent.VK_L);
+		JMenuItem loadButton = new JMenuItem(LOAD, KeyEvent.VK_L);
 		loadButton.addActionListener(this);
 		loadButton.setEnabled(true);
 		loadButton.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, 0));
@@ -186,8 +185,7 @@ public class BrissGUI extends JFrame implements ActionListener,
 
 		fileMenu.addSeparator();
 
-		JMenuItem cropstrButton;
-		cropstrButton = new JMenuItem(SHOW_CROP);
+		JMenuItem cropstrButton = new JMenuItem(SHOW_CROP);
 		cropstrButton.addActionListener(this);
 		cropstrButton.setEnabled(true);
 		fileMenu.add(cropstrButton);
@@ -199,7 +197,7 @@ public class BrissGUI extends JFrame implements ActionListener,
 
 		fileMenu.addSeparator();
 
-		openDonationLinkButton = new JMenuItem(DONATE);
+		JMenuItem openDonationLinkButton = new JMenuItem(DONATE);
 		openDonationLinkButton.addActionListener(this);
 		fileMenu.add(openDonationLinkButton);
 
@@ -209,7 +207,7 @@ public class BrissGUI extends JFrame implements ActionListener,
 		excludePagesButton.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, 0));
 		fileMenu.add(excludePagesButton);
 
-		showHelpButton = new JMenuItem(HELP);
+		JMenuItem showHelpButton = new JMenuItem(HELP);
 		showHelpButton.addActionListener(this);
 		fileMenu.add(showHelpButton);
 
@@ -367,8 +365,7 @@ public class BrissGUI extends JFrame implements ActionListener,
 	}
 
 	private File getCropFileDestination(File sourceFile) {
-		File recommendedFile = BrissFileHandling
-				.getRecommendedDestination(sourceFile);
+		File recommendedFile = BrissFileHandling.getRecommendedDestination(sourceFile);
 		JFileChooser fc = new JFileChooser(lastOpenDir);
 		fc.setSelectedFile(recommendedFile);
 		fc.setFileFilter(new PDFFileFilter());
@@ -513,27 +510,22 @@ public class BrissGUI extends JFrame implements ActionListener,
 		}
 	}
 
-	private File createAndExecuteCropJobForPreview() throws IOException,
-			DocumentException, CropException {
+	private File createAndExecuteCropJobForPreview() throws IOException, DocumentException, CropException {
 		File tmpCropFileDestination = File.createTempFile("briss", ".pdf");
 		CropDefinition cropDefinition = CropDefinition.createCropDefinition(
 				workingSet.getSourceFile(), tmpCropFileDestination,
 				workingSet.getClusterDefinition());
-		File result = DocumentCropper.crop(cropDefinition);
-		return result;
+		return DocumentCropper.crop(cropDefinition);
 	}
 
-	private File createAndExecuteCropJob(File source) throws IOException,
-			DocumentException, CropException {
-		File cropDestinationFile = getCropFileDestination(workingSet
-				.getSourceFile());
+	private File createAndExecuteCropJob(File source) throws IOException, DocumentException, CropException {
+		File cropDestinationFile = getCropFileDestination(workingSet.getSourceFile());
 		if (cropDestinationFile == null)
 			return null;
 		CropDefinition cropDefinition = CropDefinition.createCropDefinition(
 				workingSet.getSourceFile(), cropDestinationFile,
 				workingSet.getClusterDefinition());
-		File result = DocumentCropper.crop(cropDefinition);
-		return result;
+		return DocumentCropper.crop(cropDefinition);
 	}
 
 	private void setIdleState(String stateMessage) {

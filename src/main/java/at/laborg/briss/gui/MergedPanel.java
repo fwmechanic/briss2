@@ -54,6 +54,9 @@ import at.laborg.briss.BrissGUI;
 
 @SuppressWarnings("serial")
 public class MergedPanel extends JPanel {
+	/* GUI layer wrapping a PageCluster ?
+
+	  */
 
 	// last drawn rectangle. a "ghosting" rectangle will
 	// help the user to create the two equally sized crop rectangles
@@ -64,14 +67,11 @@ public class MergedPanel extends JPanel {
 	private static Point relativeHotCornerGrabDistance;
 	private static ActionState actionState = ActionState.NOTHING;
 
-	private final static int SELECT_BORDER_WIDTH = 2; // if < 2, border is invisible!
+	private final static int SELECT_BORDER_WIDTH = 1;
 	private final static Font BASE_FONT = new Font(null, Font.PLAIN, 10);
-	private final static Composite SMOOTH_NORMAL = AlphaComposite.getInstance(
-			AlphaComposite.SRC_OVER, .2f);
-	private final static Composite SMOOTH_SELECT = AlphaComposite.getInstance(
-			AlphaComposite.SRC_OVER, .5f);
-	private final static Composite XOR_COMPOSITE = AlphaComposite.getInstance(
-			AlphaComposite.SRC_OVER, .8f);
+	private final static Composite SMOOTH_NORMAL = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, .2f);
+	private final static Composite SMOOTH_SELECT = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, .5f);
+	private final static Composite XOR_COMPOSITE = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, .8f);
 	private final static float[] DASH_PATTERN = { 25f, 25f };
 	private final static BasicStroke SELECTED_STROKE = new BasicStroke(
 			SELECT_BORDER_WIDTH, BasicStroke.CAP_SQUARE,
@@ -115,9 +115,9 @@ public class MergedPanel extends JPanel {
 	private void addRatiosAsCrops(List<Float[]> ratiosList) {
 		for (Float[] ratios : cluster.getRatiosList()) {
 			DrawableCropRect rect = new DrawableCropRect();
-			rect.x = (int) (img.getWidth() * ratios[0]);
+			rect.x = (int) (img.getWidth()  * ratios[0]);
 			rect.y = (int) (img.getHeight() * ratios[3]);
-			rect.width = (int) (img.getWidth() * (1 - (ratios[0] + ratios[2])));
+			rect.width  = (int) (img.getWidth()  * (1 - (ratios[0] + ratios[2])));
 			rect.height = (int) (img.getHeight() * (1 - (ratios[1] + ratios[3])));
 			crops.add(rect);
 		}
@@ -164,10 +164,20 @@ public class MergedPanel extends JPanel {
 		g2.dispose();
 	}
 
-	private void drawNormalCropRectangle(Graphics2D g2, int cropCnt,
-			DrawableCropRect crop) {
+	private Color rgba( int r, int g, int b, double a) {
+		// to allow direct pasting from https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Colors/Color_picker_tool
+		return new Color(r, g, b, (int)Math.ceil( 255*a ) );
+	}
+
+	private void drawNormalCropRectangle(Graphics2D g2, int cropCnt, DrawableCropRect crop) {
 		g2.setComposite(SMOOTH_NORMAL);
-		g2.setColor(Color.BLUE);
+		g2.setColor(
+				//rgba(63, 252, 53, 0.5)
+				//rgba(2, 201, 92, 0.2)
+				rgba(35, 158, 239, 0.63)
+		);
+		// g2.setColor(Color.YELLOW);
+		// g2.setColor(Color.BLUE);
 		g2.fill(crop);
 		g2.setColor(Color.BLACK);
 		g2.setFont(scaleFont(String.valueOf(cropCnt + 1), crop));
@@ -180,14 +190,13 @@ public class MergedPanel extends JPanel {
 	private void drawSelectionOverlay(Graphics2D g2, DrawableCropRect crop) {
 		g2.setComposite(XOR_COMPOSITE);
 		g2.setColor(Color.BLACK);
-
 		g2.setStroke(SELECTED_STROKE);
-		g2.drawRect(crop.x + SELECT_BORDER_WIDTH / 2, crop.y
-				+ SELECT_BORDER_WIDTH / 2, crop.width - SELECT_BORDER_WIDTH,
-				crop.height - SELECT_BORDER_WIDTH);
-
-		// display crop size in milimeters
-		int w = Math.round(25.4f * crop.width / 72f);
+		g2.drawRect(crop.x + SELECT_BORDER_WIDTH / 2,
+					crop.y + SELECT_BORDER_WIDTH / 2,
+					crop.width  - SELECT_BORDER_WIDTH,
+					crop.height - SELECT_BORDER_WIDTH);
+		// display crop size in mm
+		int w = Math.round(25.4f * crop.width  / 72f);
 		int h = Math.round(25.4f * crop.height / 72f);
 		String size = Integer.toString(w) + "x" + Integer.toString(h);
 		g2.setFont(scaleFont(size, crop));
@@ -372,7 +381,6 @@ public class MergedPanel extends JPanel {
 	}
 
 	private Font scaleFont(String text, Rectangle rect) {
-
 		int size = BASE_FONT.getSize();
 		int width = this.getFontMetrics(BASE_FONT).stringWidth(text);
 		int height = this.getFontMetrics(BASE_FONT).getHeight();
@@ -382,8 +390,8 @@ public class MergedPanel extends JPanel {
 		float scaleFactorHeight = rect.height / height;
 		float scaledWidth = (scaleFactorWidth * size);
 		float scaledHeight = (scaleFactorHeight * size);
-		return BASE_FONT
-				.deriveFont((scaleFactorHeight > scaleFactorWidth) ? scaledWidth
+		return BASE_FONT.deriveFont( (scaleFactorHeight > scaleFactorWidth)
+						? scaledWidth
 						: scaledHeight);
 	}
 
