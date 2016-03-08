@@ -595,7 +595,7 @@ public class MergedPanel extends JPanel {
 					n = Integer.valueOf(nstr);
 					if (n <= 1) return;
 				}
-				int overlap = 0;
+				int overlap;
 				{
 					String nstr = JOptionPane.showInputDialog(MergedPanel.this, "Overlap", "0");
 					if (nstr == null) return;
@@ -611,7 +611,7 @@ public class MergedPanel extends JPanel {
 						else {
 							float[][] params = new float[][] { { crop.x, crop.width }, { crop.y, crop.height } };
 							for (int i = 1; i < n; i++) {
-								splits.add ((int) Math.round ((params [optionHOrV] [0] + overlap) + i * (params [optionHOrV] [1] - 2 * overlap) / n));
+								splits.add (Math.round ((params [optionHOrV] [0] + overlap) + i * (params [optionHOrV] [1] - 2 * overlap) / n));
 							}
 						}
 						List<DrawableCropRect> rs = crop.split(splits, overlap, optionHOrV == 0);

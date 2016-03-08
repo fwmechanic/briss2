@@ -1,6 +1,7 @@
 // $Id: SingleCluster.java 55 2011-02-22 21:45:59Z laborg $
 /**
  * Copyright 2010 Gerhard Aigner
+ * Copyright 2016 Kevin Goodwin
  * 
  * This file is part of BRISS.
  * 
@@ -29,27 +30,23 @@ import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.PdfReader;
 
 public final class ClusterCreator {
-	private ClusterCreator() {
-	}
+	private ClusterCreator() {}
 
 	public static ClusterDefinition clusterPages(final File source,
 			final PageExcludes pageExcludes) throws IOException {
 		PdfReader reader = new PdfReader(source.getAbsolutePath());
 		ClusterDefinition clusters = new ClusterDefinition();
-		for (int pgnum = 1; pgnum <= reader.getNumberOfPages(); pgnum++) {
-			Rectangle layoutBox = getLayoutBox(reader, pgnum);
-			// create Cluster
-			// if the pagenumber should be excluded then use it as a
-			// discriminating parameter, else use default value
-			boolean excluded = checkExclusionAndGetPageNumber(pageExcludes,
-					pgnum);
-			PageCluster tmpCluster = new PageCluster(pgnum % 2 == 0,
-					(int) layoutBox.getWidth(), (int) layoutBox.getHeight(),
-					excluded, pgnum);
+		for (int pgNum = 1; pgNum <= reader.getNumberOfPages(); pgNum++) {
+			Rectangle layoutBox = getLayoutBox(reader, pgNum);
+			PageCluster tmpCluster = new PageCluster(pgNum % 2 == 0,
+					(int) layoutBox.getWidth(),
+					(int) layoutBox.getHeight(),
+					(pageExcludes != null && pageExcludes.containsPage(pgNum)),
+					pgNum);
 			clusters.addOrMergeCluster(tmpCluster);
 		}
 		reader.close();
-		clusters.selectAndSetPagesForMerging();
+		clusters.designatePreviewPages();
 		return clusters;
 	}
 
@@ -59,10 +56,5 @@ public final class ClusterCreator {
 			layoutBox = reader.getBoxSize(pgnum, "media");
 		}
 		return layoutBox;
-	}
-
-	private static boolean checkExclusionAndGetPageNumber(
-			final PageExcludes pageExcludes, final int page) {
-		return (pageExcludes != null && pageExcludes.containsPage(page));
 	}
 }

@@ -4,9 +4,7 @@ import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
 
 public final class CropFinder {
-
-	private CropFinder() {
-	};
+	private CropFinder() {}
 
 	private static final double RATIO_LOOK_AHEAD_SATISFY = 0.85;
 	private static final int LOOK_AHEAD_PIXEL_NR = 30;
@@ -164,12 +162,11 @@ public final class CropFinder {
 
 	private static double sd(final double[] values) {
 		// get mean
-		double mean = 0;
 		double sum = 0;
 		for (double value : values) {
 			sum += value;
 		}
-		mean = sum / values.length;
+		double mean = sum / values.length;
 		double sd = 0;
 		for (double value : values) {
 			sd += (value - mean) * (value - mean);

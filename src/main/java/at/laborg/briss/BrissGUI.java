@@ -120,10 +120,11 @@ public class BrissGUI extends JFrame implements ActionListener,
 
 	private JPanel previewPanel;
 	private JProgressBar progressBar;
-	private JMenuItem cropButton, maximizeWidthButton,
+	private JMenuItem cropButton,
+			maximizeWidthButton,
 			maximizeHeightButton, showPreviewButton,
-			excludePagesButton;
-	private JMenuItem maximizeSizeButton, setSizeButton, setPositionButton,
+			excludePagesButton,
+			maximizeSizeButton, setSizeButton, setPositionButton,
 			moveLeftButton, moveRightButton, moveUpButton, moveDownButton,
 			selectAllButton, selectNoneButton;
 	private List<MergedPanel> mergedPanels = null;
@@ -133,7 +134,7 @@ public class BrissGUI extends JFrame implements ActionListener,
 	private WorkingSet workingSet;
 
 	public BrissGUI(String[] args) {
-		super("BRISS - BRight Snippet Sire");
+		super("BRISS - BRIght Snippet Sire");
 		init();
 		tryToLoadFileFromArgument(args);
 	}
@@ -392,7 +393,7 @@ public class BrissGUI extends JFrame implements ActionListener,
 				DesktopHelper.openDonationLink(DONATION_URI);
 			} catch (IOException e) {
 				JOptionPane.showMessageDialog(this, e.getMessage(),
-						"Error occured while loading",
+						"Error occurred while loading",
 						JOptionPane.ERROR_MESSAGE);
 			}
 		} else if (action.getActionCommand().equals(EXIT)) {
@@ -413,11 +414,11 @@ public class BrissGUI extends JFrame implements ActionListener,
 				setTitle("BRISS - " + workingSet.getSourceFile().getName());
 			} catch (IOException e) {
 				JOptionPane.showMessageDialog(this, e.getMessage(),
-						"Error occured while reloading",
+						"Error occurred while reloading",
 						JOptionPane.ERROR_MESSAGE);
 			} catch (PdfException e) {
 				JOptionPane.showMessageDialog(this, e.getMessage(),
-						"Error occured while reloading",
+						"Error occurred while reloading",
 						JOptionPane.ERROR_MESSAGE);
 			}
 		} else if (action.getActionCommand().equals(LOAD)) {
@@ -429,24 +430,24 @@ public class BrissGUI extends JFrame implements ActionListener,
 				setTitle("BRISS - " + inputFile.getName());
 			} catch (IOException e) {
 				JOptionPane.showMessageDialog(this, e.getMessage(),
-						"Error occured while loading",
+						"Error occurred while loading",
 						JOptionPane.ERROR_MESSAGE);
 			} catch (PdfException e) {
 				JOptionPane.showMessageDialog(this, e.getMessage(),
-						"Error occured while loading",
+						"Error occurred while loading",
 						JOptionPane.ERROR_MESSAGE);
 			}
 		}
 		else if (action.getActionCommand().equals(SHOW_CROP)) {
 			ClusterDefinition clusters = workingSet.getClusterDefinition();
-			JOptionPane.showInputDialog(this, "Crop Option: ", CropParser.cropToString (clusters.getAllRatios()));
+			JOptionPane.showInputDialog(this, "Crop Option: ", CropParser.cropToString(clusters.getAllRatios()));
 		}
 		else if (action.getActionCommand().equals(SET_CROP)) {
 			ClusterDefinition clusters = workingSet.getClusterDefinition();
-			String cropStr = JOptionPane.showInputDialog(this, "Crop Option: ", CropParser.cropToString (clusters.getAllRatios()));
+			String cropStr = JOptionPane.showInputDialog(this, "Crop Option: ", CropParser.cropToString(clusters.getAllRatios()));
 			List<List<Float []>> rLL = CropParser.parse(cropStr);
 			for (int i = 0; i < rLL.size (); i++) {
-				clusters.getClusterList ().get(i).setRatiosList(rLL.get (i));
+				clusters.getClusterList().get(i).setRatiosList(rLL.get (i));
 			}
 			createMergedPanels (false);
 			pack();
@@ -462,15 +463,15 @@ public class BrissGUI extends JFrame implements ActionListener,
 				}
 			} catch (IOException e) {
 				JOptionPane.showMessageDialog(this, e.getMessage(),
-						"Error occured while cropping",
+						"Error occurred while cropping",
 						JOptionPane.ERROR_MESSAGE);
 			} catch (DocumentException e) {
 				JOptionPane.showMessageDialog(this, e.getMessage(),
-						"Error occured while cropping",
+						"Error occurred while cropping",
 						JOptionPane.ERROR_MESSAGE);
 			} catch (CropException e) {
 				JOptionPane.showMessageDialog(this, e.getMessage(),
-						"Error occured while cropping",
+						"Error occurred while cropping",
 						JOptionPane.ERROR_MESSAGE);
 			} finally {
 				setIdleState("");
@@ -482,15 +483,15 @@ public class BrissGUI extends JFrame implements ActionListener,
 				DesktopHelper.openFileWithDesktopApp(result);
 			} catch (IOException e) {
 				JOptionPane.showMessageDialog(this, e.getMessage(),
-						"Error occured while cropping",
+						"Error occurred while cropping",
 						JOptionPane.ERROR_MESSAGE);
 			} catch (DocumentException e) {
 				JOptionPane.showMessageDialog(this, e.getMessage(),
-						"Error occured while cropping",
+						"Error occurred while cropping",
 						JOptionPane.ERROR_MESSAGE);
 			} catch (CropException e) {
 				JOptionPane.showMessageDialog(this, e.getMessage(),
-						"Error occured while cropping",
+						"Error occurred while cropping",
 						JOptionPane.ERROR_MESSAGE);
 			} finally {
 				setIdleState("");
@@ -502,11 +503,11 @@ public class BrissGUI extends JFrame implements ActionListener,
 		} else if (action.getActionCommand().equals(SET_POSITION)) {
 			setPositionSelRects();
 		} else if (action.getActionCommand().equals(SELECT_ALL)) {
-			for (MergedPanel panel : mergedPanels)
-				panel.selectAllCrops(true);
+			for (MergedPanel mp : mergedPanels)
+				mp.selectAllCrops(true);
 		} else if (action.getActionCommand().equals(SELECT_NONE)) {
-			for (MergedPanel panel : mergedPanels)
-				panel.selectAllCrops(false);
+			for (MergedPanel mp : mergedPanels)
+				mp.selectAllCrops(false);
 		}
 	}
 
@@ -620,6 +621,9 @@ public class BrissGUI extends JFrame implements ActionListener,
 		}
 	}
 
+	private static int mm_to_points( int mm  ) { return Math.round( mm  * 72f / 25.4f); }
+	private static int points_to_mm( int pts ) { return Math.round( pts * 25.4f / 72f); }
+
 	public void setDefinedSizeSelRects() {
 		// set size of selected rectangles
 		// based on user input
@@ -632,10 +636,10 @@ public class BrissGUI extends JFrame implements ActionListener,
 			maxHeight = Math.max(maxHeight, mp.selCropsGetMaxHeight());
 		}
 		if ((maxWidth >= 0) && (maxHeight >= 0)) {
-			maxWidth = Math.round(25.4f * maxWidth / 72f);
-			maxHeight = Math.round(25.4f * maxHeight / 72f);
+			maxWidth  = points_to_mm( maxWidth  );
+			maxHeight = points_to_mm( maxHeight );
 			defInput = Integer.toString(maxWidth) + " "
-					+ Integer.toString(maxHeight);
+					 + Integer.toString(maxHeight);
 		}
 		// get user input
 		// maximums are used as a default
@@ -647,17 +651,16 @@ public class BrissGUI extends JFrame implements ActionListener,
 		if (dims.length != 2) {
 			return;
 		}
-		int w = -1;
-		int h = -1;
+		int w;
+		int h;
 		try {
 			w = Integer.parseInt(dims[0]);
 			h = Integer.parseInt(dims[1]);
 		} catch (NumberFormatException e) {
 			return;
 		}
-		// convert from mm to points
-		w = Math.round(w * 72f / 25.4f);
-		h = Math.round(h * 72f / 25.4f);
+		w = mm_to_points( w );
+		h = mm_to_points( h );
 		for (MergedPanel mp : mergedPanels) {
 			mp.selCropsSetSize(w,h);
 		}
@@ -675,8 +678,8 @@ public class BrissGUI extends JFrame implements ActionListener,
 			minY = Math.min(minY, mp.selCropsGetUpmost()   );
 		}
 		if ((minX < Integer.MAX_VALUE) && (minY < Integer.MAX_VALUE)) {
-			minX = Math.round(25.4f * minX / 72f);
-			minY = Math.round(25.4f * minY / 72f);
+			minX = points_to_mm(minX);
+			minY = points_to_mm(minY);
 			defInput = Integer.toString(minX) + " " + Integer.toString(minY);
 		}
 		// get user input
@@ -689,17 +692,16 @@ public class BrissGUI extends JFrame implements ActionListener,
 		if (dims.length != 2) {
 			return;
 		}
-		int x = -1;
-		int y = -1;
+		int x;
+		int y;
 		try {
 			x = Integer.parseInt(dims[0]);
 			y = Integer.parseInt(dims[1]);
 		} catch (NumberFormatException e) {
 			return;
 		}
-		// convert from milimeters to points
-		x = Math.round(x * 72f / 25.4f);
-		y = Math.round(y * 72f / 25.4f);
+		x = mm_to_points(x);
+		y = mm_to_points(y);
 		for (MergedPanel mp : mergedPanels) {
 			mp.selCropsMoveAbsolute(x, y);
 		}
@@ -773,7 +775,7 @@ public class BrissGUI extends JFrame implements ActionListener,
 
 		for (PageCluster newCluster : newClusters.getClusterList()) {
 			for (Integer pgNum : newCluster.getMemberPgNums()) {
-				PageCluster oldCluster = oldClusters.getSingleCluster(pgNum);
+				PageCluster oldCluster = oldClusters.getClusterContainingPage(pgNum);
 				for (Float[] ratios : oldCluster.getRatiosList()) {
 					newCluster.addRatios(ratios);
 				}

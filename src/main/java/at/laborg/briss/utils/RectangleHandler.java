@@ -5,9 +5,7 @@ import java.util.List;
 import com.itextpdf.text.Rectangle;
 
 public final class RectangleHandler {
-
-	private RectangleHandler() {
-	};
+	private RectangleHandler() {}
 
 	public static Rectangle calculateScaledRectangle(
 			final List<Rectangle> boxes, final Float[] ratios,

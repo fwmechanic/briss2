@@ -36,36 +36,24 @@ import at.laborg.briss.utils.CropParser;
 import com.itextpdf.text.DocumentException;
 
 public final class BrissCMD {
-
-	private BrissCMD() {
-	}
+	private BrissCMD() {}
 
 	public static void autoCrop(final String[] args) {
-
-		CommandValues workDescription = CommandValues
-				.parseToWorkDescription(args);
-
+		CommandValues workDescription = CommandValues.parseToWorkDescription(args);
 		if (!CommandValues.isValidJob(workDescription))
 			return;
-
-		System.out
-				.println("Clustering PDF: " + workDescription.getSourceFile());
-		ClusterDefinition clusterDefinition = null;
+		System.out.println("Clustering PDF: " + workDescription.getSourceFile());
+		ClusterDefinition clusterDefinition;
 		try {
-			clusterDefinition = ClusterCreator.clusterPages(
-					workDescription.getSourceFile(), null);
+			clusterDefinition = ClusterCreator.clusterPages(workDescription.getSourceFile(), null);
 		} catch (IOException e1) {
-			System.out.println("Error occured while clustering.");
+			System.out.println("Error occurred while clustering.");
 			e1.printStackTrace(System.out);
 			return;
 		}
-		System.out.println("Created "
-				+ clusterDefinition.getClusterList().size() + " clusters.");
-
-		ClusterRenderWorker cRW = new ClusterRenderWorker(
-				workDescription.getSourceFile(), clusterDefinition);
+		System.out.println("Created " + clusterDefinition.getClusterList().size() + " clusters.");
+		ClusterRenderWorker cRW = new ClusterRenderWorker(workDescription.getSourceFile(), clusterDefinition);
 		cRW.start();
-
 		System.out.print("Starting to render clusters.");
 		while (cRW.isAlive()) {
 			System.out.print(".");
@@ -78,8 +66,7 @@ public final class BrissCMD {
 		System.out.println("Calculating crop rectangles.");
 		try {
 			for (PageCluster cluster : clusterDefinition.getClusterList()) {
-				Float[] auto = CropFinder.getAutoCropFloats(cluster
-						.getImageData().getPreviewImage());
+				Float[] auto = CropFinder.getAutoCropFloats(cluster.getImageData().getPreviewImage());
 				cluster.addRatios(auto);
 			}
 			CropDefinition cropDefintion = CropDefinition.createCropDefinition(
@@ -87,8 +74,7 @@ public final class BrissCMD {
 					workDescription.getDestFile(), clusterDefinition);
 			System.out.println("Starting to crop files.");
 			DocumentCropper.crop(cropDefintion);
-			System.out.println("Cropping succesful. Cropped to:"
-					+ workDescription.getDestFile().getAbsolutePath());
+			System.out.println("Successfully cropped to:" + workDescription.getDestFile().getAbsolutePath());
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (IllegalArgumentException e) {
@@ -101,35 +87,25 @@ public final class BrissCMD {
 	}
 
 	public static void customCrop(String[] args) {
-
-		CommandValues workDescription = CommandValues
-				.parseToWorkDescription(args);
-
+		CommandValues workDescription = CommandValues.parseToWorkDescription(args);
 		if (!CommandValues.isValidJob(workDescription))
 			return;
-
-		System.out
-				.println("Clustering PDF: " + workDescription.getSourceFile());
-		ClusterDefinition clusterDefinition = null;
+		System.out.println("Clustering PDF: " + workDescription.getSourceFile());
+		ClusterDefinition clusterDefinition;
 		try {
-			clusterDefinition = ClusterCreator.clusterPages(
-					workDescription.getSourceFile(), null);
+			clusterDefinition = ClusterCreator.clusterPages(workDescription.getSourceFile(), null);
 		} catch (IOException e1) {
-			System.out.println("Error occured while clustering.");
+			System.out.println("Error occurred while clustering.");
 			e1.printStackTrace(System.out);
 			return;
 		}
-		System.out.println("Created "
-				+ clusterDefinition.getClusterList().size() + " clusters.");
+		System.out.println("Created " + clusterDefinition.getClusterList().size() + " clusters.");
 		if(workDescription.getCrop().size() != clusterDefinition.getClusterList().size()) {
 			System.err.println("You need to specify a crop definition for ALL clusters!");
 			return;
 		}
-
-		ClusterRenderWorker cRW = new ClusterRenderWorker(
-				workDescription.getSourceFile(), clusterDefinition);
+		ClusterRenderWorker cRW = new ClusterRenderWorker(workDescription.getSourceFile(), clusterDefinition);
 		cRW.start();
-
 		System.out.print("Starting to render clusters.");
 		while (cRW.isAlive()) {
 			System.out.print(".");
@@ -148,13 +124,12 @@ public final class BrissCMD {
 					clusterDefinition.getClusterList().get(i).addRatios(cur);
 				}
 			}
-			CropDefinition cropDefintion = CropDefinition.createCropDefinition(
+			CropDefinition cropDefinition = CropDefinition.createCropDefinition(
 					workDescription.getSourceFile(),
 					workDescription.getDestFile(), clusterDefinition);
 			System.out.println("Starting to crop files.");
-			DocumentCropper.crop(cropDefintion);
-			System.out.println("Cropping succesful. Cropped to:"
-					+ workDescription.getDestFile().getAbsolutePath());
+			DocumentCropper.crop(cropDefinition);
+			System.out.println("Successfully cropped to:" + workDescription.getDestFile().getAbsolutePath());
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (IllegalArgumentException e) {
@@ -167,7 +142,6 @@ public final class BrissCMD {
 	}
 
 	private static class CommandValues {
-
 		private static final String SOURCE_FILE_CMD = "-s";
 		private static final String DEST_FILE_CMD = "-d";
 		private static final String CROP_CMD = "-c";
@@ -195,7 +169,6 @@ public final class BrissCMD {
 				}
 				i++;
 			}
-
 			return commandValues;
 		}
 
@@ -211,21 +184,17 @@ public final class BrissCMD {
 
 		private static boolean isValidJob(final CommandValues job) {
 			if (job.getSourceFile() == null) {
-				System.out
-						.println("No source file submitted: try \"java -jar Briss.0.0.13 -s filename.pdf\"");
+				System.out.println("No source file submitted: try \"java -jar Briss.0.0.13 -s filename.pdf\"");
 				return false;
 			}
 			if (!job.getSourceFile().exists()) {
-				System.out.println("File: " + job.getSourceFile()
-						+ " doesn't exist");
+				System.out.println("File: " + job.getSourceFile() + " doesn't exist");
 				return false;
 			}
 			if (job.getDestFile() == null) {
-				File recommendedDest = BrissFileHandling
-						.getRecommendedDestination(job.getSourceFile());
+				File recommendedDest = BrissFileHandling.getRecommendedDestination(job.getSourceFile());
 				job.setDestFile(recommendedDest);
-				System.out
-						.println("Since no destination was provided destination will be set to  : "
+				System.out.println("Since no destination was provided destination will be set to  : "
 								+ recommendedDest.getAbsolutePath());
 			}
 			try {
@@ -238,7 +207,6 @@ public final class BrissCMD {
 				e.getStackTrace();
 				return false;
 			}
-
 			return true;
 		}
 
@@ -264,6 +232,5 @@ public final class BrissCMD {
 		public List<List<Float[]>> getCrop() {
 			return crop;
 		}
-
 	}
 }

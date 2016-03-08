@@ -19,8 +19,7 @@ package at.laborg.briss;
 
 public final class Briss {
 
-	private Briss() {
-	};
+	private Briss() {}
 
 	public static void main(final String[] args) {
 

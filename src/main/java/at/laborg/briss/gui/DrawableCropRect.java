@@ -15,26 +15,9 @@ public class DrawableCropRect extends Rectangle {
 
 	private boolean selected = false;
 
-	/**
-	 * Copy constructor.
-	 * 
-	 * @param crop
-	 */
-	public DrawableCropRect(final DrawableCropRect crop) {
-		super();
-		this.x = crop.x;
-		this.y = crop.y;
-		this.height = crop.height;
-		this.width = crop.width;
-	}
-
-	public DrawableCropRect() {
-		super();
-	}
-	
-	public DrawableCropRect(int x, int y, int w, int h) {
-		super(x, y, w, h);
-	}
+	public DrawableCropRect()                            { super(); }
+	public DrawableCropRect(final DrawableCropRect crop) { super(crop.x, crop.y, crop.width, crop.height); } // copy ctor
+	public DrawableCropRect(int x, int y, int w, int h)  { super(     x,      y,      w,          h     ); }
 	
 	public final List<DrawableCropRect> split (List<Integer> at, int olap2 /* half-overlap */, boolean onX) {
 		List<DrawableCropRect> result = new ArrayList<DrawableCropRect> ();
@@ -46,8 +29,8 @@ public class DrawableCropRect extends Rectangle {
 			DrawableCropRect r = new DrawableCropRect (this);
 			int d = p - prev + 2 * olap2;
 			prev -= olap2;
-			if (onX) { r.x = prev; r.width = d; }
-			else { r.y = prev; r.height = d; }
+			if (onX) { r.x = prev; r.width  = d; }
+			else     { r.y = prev; r.height = d; }
 			prev = p;
 			result.add (r);
 		}
@@ -75,12 +58,12 @@ public class DrawableCropRect extends Rectangle {
 	}
 
 	public final boolean containsInHotCornerUL(final Point p) {
-		return ((p.x > getX() && p.x <= getX() + CORNER_DIMENSION) && (p.y > getY() && p.y <= getY()
-				+ CORNER_DIMENSION));
+		return (   (p.x > getX() && p.x <= getX() + CORNER_DIMENSION)
+				&& (p.y > getY() && p.y <= getY() + CORNER_DIMENSION));
 	}
 
 	public final boolean containsInHotCornerLR(final Point p) {
-		return ((p.x < getMaxX() && p.x > getMaxX() - CORNER_DIMENSION) && (p.y < getMaxY() && p.y > getMaxY()
-				- CORNER_DIMENSION));
+		return (   (p.x < getMaxX() && p.x > getMaxX() - CORNER_DIMENSION)
+				&& (p.y < getMaxY() && p.y > getMaxY() - CORNER_DIMENSION));
 	}
 }

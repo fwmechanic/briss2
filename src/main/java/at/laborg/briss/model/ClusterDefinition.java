@@ -21,12 +21,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ClusterDefinition {
+	/*
+	   a list of PageClusters
+	 */
 
 	private final List<PageCluster> clusters = new ArrayList<PageCluster>();
 
-	public final PageCluster getSingleCluster(final int pageNumber) {
+	public final PageCluster getClusterContainingPage(final int pgNum) {
 		for (PageCluster cluster : clusters) {
-			if (cluster.getMemberPgNums().contains(pageNumber))
+			if (cluster.getMemberPgNums().contains(pgNum))
 				return cluster;
 		}
 		return null;
@@ -45,23 +48,16 @@ public class ClusterDefinition {
 	}
 
 	public final void addOrMergeCluster(final PageCluster tmpCluster) {
-		PageCluster existingCluster = findNearlyEqualCluster(tmpCluster);
-		if (existingCluster != null) {
-			existingCluster.incorporate(tmpCluster);
-		} else {
-			clusters.add(tmpCluster);
-		}
-	}
-
-	private PageCluster findNearlyEqualCluster(final PageCluster clusterToCheck) {
 		for (PageCluster cluster : clusters) {
-			if (cluster.isClusterNearlyEqual(clusterToCheck))
-				return cluster;
+			if (cluster.isClusterNearlyEqual(tmpCluster)) {
+				cluster.incorporate(tmpCluster);
+				return;
+			}
 		}
-		return null;
+		clusters.add(tmpCluster);
 	}
 
-	public final void selectAndSetPagesForMerging() {
+	public final void designatePreviewPages() {
 		for (PageCluster cluster : clusters) {
 			cluster.designatePreviewPages();
 		}

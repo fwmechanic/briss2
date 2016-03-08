@@ -4,9 +4,7 @@ import java.io.File;
 import java.io.IOException;
 
 public final class BrissFileHandling {
-
-	private BrissFileHandling() {
-	};
+	private BrissFileHandling() {}
 
 	private static final String RECOMMENDED_ENDING = "_cropped.pdf";
 
