@@ -498,45 +498,41 @@ public class MergedPanel extends JPanel {
 		@Override
 		public void keyPressed(KeyEvent e) {
 			switch (e.getKeyCode()) {
-				case KeyEvent.VK_C:
-					if (e.getModifiers() == InputEvent.CTRL_MASK) {
-						copyToClipBoard();
-					}
-					break;
-				case KeyEvent.VK_V:
-					if (e.getModifiers() == InputEvent.CTRL_MASK) {
-						pasteFromClipBoard();
-					}
-					break;
-				case KeyEvent.VK_DELETE:
-					deleteAllSelected();
-					break;
-				case KeyEvent.VK_LEFT:
-				case KeyEvent.VK_RIGHT:
-				case KeyEvent.VK_UP:
-				case KeyEvent.VK_DOWN:
-					int x = 0;
-					int y = 0;
-					switch (e.getKeyCode()) {
-						case KeyEvent.VK_LEFT:	x = -1; break;
-						case KeyEvent.VK_RIGHT:	x =  1; break;
-						case KeyEvent.VK_UP:	y = -1; break;
-						case KeyEvent.VK_DOWN:	y =  1; break;
-					}
-					if ((e.getModifiers() & InputEvent.SHIFT_MASK) != 0) {
-						x *= 10;
-						y *= 10;
-					}
-					if ((e.getModifiers() & InputEvent.CTRL_MASK) != 0) {
-						briss.resizeSelectedRects(x, y);
-					}
-					else /* if ((e.getModifiers() & InputEvent.ALT_MASK) != 0) */ {
-						briss.moveSelectedRects(x, y);
-					}
-					e.consume(); // prevent framework from taking further action on these events
-					break;
-				default:
-			}
+			case KeyEvent.VK_C:
+				if (e.getModifiers() == InputEvent.CTRL_MASK) {
+					copyToClipBoard();
+				} break;
+			case KeyEvent.VK_V:
+				if (e.getModifiers() == InputEvent.CTRL_MASK) {
+					pasteFromClipBoard();
+				} break;
+			case KeyEvent.VK_DELETE:	deleteAllSelected(); break;
+			case KeyEvent.VK_LEFT:
+			case KeyEvent.VK_RIGHT:
+			case KeyEvent.VK_UP:
+			case KeyEvent.VK_DOWN:
+				int x = 0;
+				int y = 0;
+				switch (e.getKeyCode()) {
+					case KeyEvent.VK_LEFT:	x = -1; break;
+					case KeyEvent.VK_RIGHT:	x =  1; break;
+					case KeyEvent.VK_UP:	y = -1; break;
+					case KeyEvent.VK_DOWN:	y =  1; break;
+				}
+				if ((e.getModifiers() & InputEvent.SHIFT_MASK) != 0) {
+					x *= 10;
+					y *= 10;
+				}
+				if ((e.getModifiers() & InputEvent.CTRL_MASK) != 0) {
+					briss.resizeSelectedRects(x, y);
+				}
+				else /* if ((e.getModifiers() & InputEvent.ALT_MASK) != 0) */ {
+					briss.moveSelectedRects(x, y);
+				}
+				e.consume(); // prevent framework from taking further action on these events
+				break;
+			default:
+		}
 		}
 	}
 
@@ -550,7 +546,8 @@ public class MergedPanel extends JPanel {
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			if (PopUpMenuForCropRectangles.DELETE.equals(e.getActionCommand())) {
+			switch( e.getActionCommand() ) {
+			case PopUpMenuForCropRectangles.DELETE: {
 				for (Rectangle crop : crops) {
 					if (crop.contains(popUpMenuPoint)) {
 						crops.remove(crop);
@@ -559,14 +556,15 @@ public class MergedPanel extends JPanel {
 				}
 				xlatCropRectsToCropRatios(crops);
 				repaint();
-			} else if (PopUpMenuForCropRectangles.SPLIT.equals(e.getActionCommand())) {
+				} break;
+			case PopUpMenuForCropRectangles.SPLIT: {
 				Point pt = popUpMenuPoint;
-				String [] options;
-				options = new String [] { "At point", "Equally" };
-				int optionAtPoint = JOptionPane.showOptionDialog(MergedPanel.this, "Split Type", "Split Type", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options [0]);
+				String[] options;
+				options = new String[]{"At point", "Equally"};
+				int optionAtPoint = JOptionPane.showOptionDialog(MergedPanel.this, "Split Type", "Split Type", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
 				if (optionAtPoint == JOptionPane.CLOSED_OPTION) return;
-				options = new String [] { "Horizontal", "Vertical" }; 
-				int optionHOrV = JOptionPane.showOptionDialog(MergedPanel.this, "Split Direction", "Split Direction", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options [0]);
+				options = new String[]{"Horizontal", "Vertical"};
+				int optionHOrV = JOptionPane.showOptionDialog(MergedPanel.this, "Split Direction", "Split Direction", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
 				if (optionHOrV == JOptionPane.CLOSED_OPTION) return;
 				int n = 0;
 				if (optionAtPoint == 1) {
@@ -580,18 +578,18 @@ public class MergedPanel extends JPanel {
 					String nstr = JOptionPane.showInputDialog(MergedPanel.this, "Overlap", "0");
 					if (nstr == null) return;
 					overlap = Integer.valueOf(nstr);
-					overlap = (int) Math.ceil(overlap / 2.0); 
+					overlap = (int) Math.ceil(overlap / 2.0);
 				}
-				for (ListIterator<DrawableCropRect> iter = crops.listIterator(); iter.hasNext (); ) {
-					DrawableCropRect crop = iter.next ();
+				for (ListIterator<DrawableCropRect> iter = crops.listIterator(); iter.hasNext(); ) {
+					DrawableCropRect crop = iter.next();
 					if (crop.contains(pt)) {
-						List<Integer> splits = new ArrayList<Integer> ();
+						List<Integer> splits = new ArrayList<Integer>();
 						if (optionAtPoint == 0)
 							splits.add(optionHOrV == 0 ? pt.x : pt.y);
 						else {
-							float[][] params = new float[][] { { crop.x, crop.width }, { crop.y, crop.height } };
+							float[][] params = new float[][]{{crop.x, crop.width}, {crop.y, crop.height}};
 							for (int i = 1; i < n; i++) {
-								splits.add (Math.round ((params [optionHOrV] [0] + overlap) + i * (params [optionHOrV] [1] - 2 * overlap) / n));
+								splits.add(Math.round((params[optionHOrV][0] + overlap) + i * (params[optionHOrV][1] - 2 * overlap) / n));
 							}
 						}
 						List<DrawableCropRect> rs = crop.split(splits, overlap, optionHOrV == 0);
@@ -602,15 +600,12 @@ public class MergedPanel extends JPanel {
 				}
 				xlatCropRectsToCropRatios(crops);
 				repaint();
-			} else if (PopUpMenuForCropRectangles.SELECT_DESELECT.equals(e.getActionCommand())) {
-				toggleCropSelectionUnderPt(popUpMenuPoint);
-			} else if (PopUpMenuForCropRectangles.COPY.equals(e.getActionCommand())) {
-				copyToClipBoard();
-			} else if (PopUpMenuForCropRectangles.PASTE.equals(e.getActionCommand())) {
-				pasteFromClipBoard();
-			} else if (PopUpMenuForCropRectangles.ALIGN_SELECTED.equals(e.getActionCommand())) {
-				alignSelected(popUpMenuPoint);
-			}
+				} break;
+			case PopUpMenuForCropRectangles.SELECT_DESELECT: toggleCropSelectionUnderPt(popUpMenuPoint); break;
+			case PopUpMenuForCropRectangles.COPY:			copyToClipBoard(); break;
+			case PopUpMenuForCropRectangles.PASTE: 			pasteFromClipBoard(); break;
+			case PopUpMenuForCropRectangles.ALIGN_SELECTED: alignSelected(popUpMenuPoint); break;
+		}
 		}
 
 		@Override

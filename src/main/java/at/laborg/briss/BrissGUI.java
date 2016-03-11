@@ -319,24 +319,21 @@ public class BrissGUI extends JFrame implements ActionListener,
 	}
 
 	public void actionPerformed(ActionEvent action) {
-		if (action.getActionCommand().equals(DONATE)) {
+		switch( action.getActionCommand() ) {
+		case DONATE:
 			try {
 				DesktopHelper.openDonationLink(DONATION_URI);
 			} catch (IOException e) {
 				JOptionPane.showMessageDialog(this, e.getMessage(), emLOAD, JOptionPane.ERROR_MESSAGE);
-			}
-		} else if (action.getActionCommand().equals(EXIT)) {
-			System.exit(0);
-		} else if (action.getActionCommand().equals(HELP)) {
-			new HelpDialog(this, "Briss Help", Dialog.ModalityType.MODELESS);
-		} else if (action.getActionCommand().equals(MAXIMIZE_HEIGHT)) {
-			maximizeHeightInSelectedRects();
-		} else if (action.getActionCommand().equals(MAXIMIZE_WIDTH)) {
-			maximizeWidthInSelectedRects();
-		} else if (action.getActionCommand().equals(EXCLUDE_OTHER_PAGES)) {
+			} break;
+		case EXIT: System.exit(0);
+		case HELP: new HelpDialog(this, "Briss Help", Dialog.ModalityType.MODELESS); break;
+		case MAXIMIZE_HEIGHT: maximizeHeightInSelectedRects(); break;
+		case MAXIMIZE_WIDTH:  maximizeWidthInSelectedRects(); break;
+		case EXCLUDE_OTHER_PAGES:
 			if (workingSet.getSourceFile() == null) {
 				return;
-		    }
+			}
 			setWorkingState("Exclude other pages");
 			try {
 				reloadWithOtherExcludes();
@@ -345,8 +342,8 @@ public class BrissGUI extends JFrame implements ActionListener,
 				JOptionPane.showMessageDialog(this, e.getMessage(), emRELOAD, JOptionPane.ERROR_MESSAGE);
 			} catch (PdfException e) {
 				JOptionPane.showMessageDialog(this, e.getMessage(), emRELOAD, JOptionPane.ERROR_MESSAGE);
-			}
-		} else if (action.getActionCommand().equals(LOAD)) {
+			} break;
+		case LOAD:
 			File inputFile = getNewFileToCrop();
 			if (inputFile == null)
 				return;
@@ -357,24 +354,23 @@ public class BrissGUI extends JFrame implements ActionListener,
 				JOptionPane.showMessageDialog(this, e.getMessage(), emLOAD, JOptionPane.ERROR_MESSAGE);
 			} catch (PdfException e) {
 				JOptionPane.showMessageDialog(this, e.getMessage(), emLOAD, JOptionPane.ERROR_MESSAGE);
-			}
-		}
-		else if (action.getActionCommand().equals(SHOW_CROP)) {
+			} break;
+		case SHOW_CROP: {
 			ClusterDefinition clusters = workingSet.getClusterDefinition();
 			JOptionPane.showInputDialog(this, "Crop Option: ", CropParser.cropToString(clusters.getAllRatios()));
-		}
-		else if (action.getActionCommand().equals(SET_CROP)) {
+			} break;
+		case SET_CROP: {
 			ClusterDefinition clusters = workingSet.getClusterDefinition();
 			String cropStr = JOptionPane.showInputDialog(this, "Crop Option: ", CropParser.cropToString(clusters.getAllRatios()));
-			List<List<Float []>> rLL = CropParser.parse(cropStr);
-			for (int i = 0; i < rLL.size (); i++) {
-				clusters.getClusterList().get(i).setRatiosList(rLL.get (i));
+			List<List<Float[]>> rLL = CropParser.parse(cropStr);
+			for (int i = 0; i < rLL.size(); i++) {
+				clusters.getClusterList().get(i).setRatiosList(rLL.get(i));
 			}
-			createMergedPanels (false);
+			createMergedPanels(false);
 			pack();
 			repaint();
-		}
-		else if (action.getActionCommand().equals(CROP)) {
+			} break;
+		case CROP:
 			try {
 				setWorkingState("loading PDF");
 				File result = createAndExecuteCropJob(workingSet.getSourceFile());
@@ -390,8 +386,8 @@ public class BrissGUI extends JFrame implements ActionListener,
 				JOptionPane.showMessageDialog(this, e.getMessage(), emCROP, JOptionPane.ERROR_MESSAGE);
 			} finally {
 				setIdleState("");
-			}
-		} else if (action.getActionCommand().equals(PREVIEW)) {
+			} break;
+		case PREVIEW:
 			try {
 				setWorkingState("Creating and showing preview...");
 				File result = createAndExecuteCropJobForPreview();
@@ -404,19 +400,18 @@ public class BrissGUI extends JFrame implements ActionListener,
 				JOptionPane.showMessageDialog(this, e.getMessage(), emCROP, JOptionPane.ERROR_MESSAGE);
 			} finally {
 				setIdleState("");
-			}
-		} else if (action.getActionCommand().equals(MAXIMIZE_SIZE)) {
-			maximizeSizeInAllRects();
-		} else if (action.getActionCommand().equals(SET_SIZE)) {
-			setDefinedSizeSelRects();
-		} else if (action.getActionCommand().equals(SET_POSITION)) {
-			setPositionSelRects();
-		} else if (action.getActionCommand().equals(SELECT_ALL)) {
+			} break;
+		case MAXIMIZE_SIZE:	maximizeSizeInAllRects(); break;
+		case SET_SIZE:		setDefinedSizeSelRects(); break;
+		case SET_POSITION:	setPositionSelRects();    break;
+		case SELECT_ALL:
 			for (MergedPanel mp : mergedPanels)
 				mp.selectAllCrops(true);
-		} else if (action.getActionCommand().equals(SELECT_NONE)) {
+			break;
+		case SELECT_NONE:
 			for (MergedPanel mp : mergedPanels)
 				mp.selectAllCrops(false);
+			break;
 		}
 	}
 
@@ -657,7 +652,6 @@ public class BrissGUI extends JFrame implements ActionListener,
 
 	private void updateWorkingSet(ClusterDefinition newClusters, PageExcludes newPageExcludes, File newSource) {
 		if (workingSet == null) {
-			// completely new
 			workingSet = new WorkingSet(newSource);
 		} else if (workingSet.getSourceFile().equals(newSource)) {
 			// just reload with other excludes
