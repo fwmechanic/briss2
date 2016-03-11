@@ -96,8 +96,8 @@ public class MergedPanel extends JPanel {
 		if (autoCrop) {
 			cluster.addCropRatio( CropFinder.calcCropRatioOfImg(img) );
 		}
-		setPreferredSize( new Dimension(img.getWidth(), img.getHeight()));
-		setSize(          new Dimension(img.getWidth(), img.getHeight()));
+		setPreferredSize( new Dimension(img.getWidth(), img.getHeight()) );
+		setSize(          new Dimension(img.getWidth(), img.getHeight()) );
 		if (cluster.getImageData().isRenderable()) {
 			MergedPanelMouseAdapter mouseAdapter = new MergedPanelMouseAdapter();
 			addMouseMotionListener(mouseAdapter);
@@ -197,7 +197,7 @@ public class MergedPanel extends JPanel {
 		g2.setFont(scaleFont(size, crop));
 		g2.setColor(Color.YELLOW);
 		g2.setComposite(SMOOTH_SELECT);
-		g2.drawString(size, crop.x + SELECT_BORDER_WIDTH,
+		g2.drawString(size, crop.x +               SELECT_BORDER_WIDTH,
 							crop.y + crop.height - SELECT_BORDER_WIDTH);
 	}
 
@@ -351,20 +351,20 @@ public class MergedPanel extends JPanel {
 	 */
 	private static Float[] getCutRatiosForPdf(Rectangle crop, int imgWidth, int imgHeight) {
 		int x1 = crop.x;
-		int x2 = x1 + crop.width;
 		int y1 = crop.y;
+		int x2 = x1 + crop.width;
 		int y2 = y1 + crop.height;
 		// constrain
 		x1 = Math.max( x1, 0 );
-		x2 = Math.min( x2, imgWidth );
 		y1 = Math.max( y1, 0 );
+		x2 = Math.min( x2, imgWidth );
 		y2 = Math.min( y2, imgHeight );
 		// recalc
 		Float[] ratios = new Float[4];
-		ratios[0] = (float) x1 / imgWidth;  // left
-		ratios[1] = (float) (imgHeight - y2) / imgHeight;  // bottom
-		ratios[2] = 1 - ((float) x2 / imgWidth);  // right
-		ratios[3] = 1 - ((float) (imgHeight - y1) / imgHeight);  // top
+		ratios[0] =      (float)              x1  / imgWidth  ; // left
+		ratios[1] =      (float) (imgHeight - y2) / imgHeight ; // bottom
+		ratios[2] = 1 - ((float)              x2  / imgWidth) ; // right
+		ratios[3] = 1 - ((float) (imgHeight - y1) / imgHeight); // top
 		return ratios;
 	}
 
@@ -374,9 +374,9 @@ public class MergedPanel extends JPanel {
 		int height = this.getFontMetrics(BASE_FONT).getHeight();
 		if (width == 0 || height == 0)
 			return BASE_FONT;
-		float scaleFactorWidth = rect.width / width;
+		float scaleFactorWidth  = rect.width  / width;
 		float scaleFactorHeight = rect.height / height;
-		float scaledWidth = (scaleFactorWidth * size);
+		float scaledWidth  = (scaleFactorWidth  * size);
 		float scaledHeight = (scaleFactorHeight * size);
 		return BASE_FONT.deriveFont( (scaleFactorHeight > scaleFactorWidth)
 						? scaledWidth
@@ -518,18 +518,10 @@ public class MergedPanel extends JPanel {
 					int x = 0;
 					int y = 0;
 					switch (e.getKeyCode()) {
-						case KeyEvent.VK_LEFT:
-							x = -1;
-							break;
-						case KeyEvent.VK_RIGHT:
-							x = 1;
-							break;
-						case KeyEvent.VK_UP:
-							y = -1;
-							break;
-						case KeyEvent.VK_DOWN:
-							y = 1;
-							break;
+						case KeyEvent.VK_LEFT:	x = -1; break;
+						case KeyEvent.VK_RIGHT:	x =  1; break;
+						case KeyEvent.VK_UP:	y = -1; break;
+						case KeyEvent.VK_DOWN:	y =  1; break;
 					}
 					if ((e.getModifiers() & InputEvent.SHIFT_MASK) != 0) {
 						x *= 10;
@@ -759,8 +751,14 @@ public class MergedPanel extends JPanel {
 			public static final String PASTE = "Paste rectangles";
 			public static final String ALIGN_SELECTED = "Align selected rectangles";
 
-			public PopUpMenuForCropRectangles() {
+			private void addJMI( String st, boolean enable ) {
+				JMenuItem jmi = new JMenuItem(st);
+				jmi.addActionListener(MergedPanelMouseAdapter.this);
+				jmi.setEnabled( enable );
+				add(jmi);;
+			}
 
+			public PopUpMenuForCropRectangles() {
 				boolean isContainedInRectangle = false;
 				for (DrawableCropRect crop : crops) {
 					if (crop.contains(popUpMenuPoint)) {
@@ -768,15 +766,9 @@ public class MergedPanel extends JPanel {
 					}
 				}
 				if (isContainedInRectangle) {
-					JMenuItem deleteItem = new JMenuItem(DELETE);
-					deleteItem.addActionListener(MergedPanelMouseAdapter.this);
-					add(deleteItem);
-					JMenuItem splitItem = new JMenuItem(SPLIT);
-					splitItem.addActionListener(MergedPanelMouseAdapter.this);
-					add(splitItem);
-					JMenuItem selectDeselectItem = new JMenuItem(SELECT_DESELECT);
-					selectDeselectItem.addActionListener(MergedPanelMouseAdapter.this);
-					add(selectDeselectItem);
+					addJMI( DELETE, false );
+					addJMI( SPLIT , false );
+					addJMI( SELECT_DESELECT, false );
 				}
 				boolean copyPossible = false;
 				for (DrawableCropRect crop : crops) {
@@ -784,20 +776,9 @@ public class MergedPanel extends JPanel {
 						copyPossible = true;
 					}
 				}
-				JMenuItem copyItem = new JMenuItem(COPY);
-				copyItem.addActionListener(MergedPanelMouseAdapter.this);
-				copyItem.setEnabled(copyPossible);
-				add(copyItem);
-
-				JMenuItem pasteItem = new JMenuItem(PASTE);
-				pasteItem.addActionListener(MergedPanelMouseAdapter.this);
-				pasteItem.setEnabled(ClipBoard.getInstance().getAmountOfCropsInClipBoard() > 0);
-				add(pasteItem);
-
-				JMenuItem alignItem = new JMenuItem(ALIGN_SELECTED);
-				alignItem.addActionListener(MergedPanelMouseAdapter.this);
-				alignItem.setEnabled(true);
-				add(alignItem);
+				addJMI( COPY , copyPossible );
+				addJMI( PASTE, ClipBoard.getInstance().getAmountOfCropsInClipBoard() > 0 );
+				addJMI( ALIGN_SELECTED, true );
 			}
 		}
 	}

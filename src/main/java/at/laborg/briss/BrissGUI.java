@@ -291,8 +291,7 @@ public class BrissGUI extends JFrame implements ActionListener,
 				lastUserExcludes = input; // got past any ParseExecption, save for next time
 				return rv;
 			} catch (ParseException e) {
-				JOptionPane.showMessageDialog(null, e.getMessage(),
-						"Input Error", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(null, e.getMessage(), "Input Error", JOptionPane.ERROR_MESSAGE);
 			}
 		}
 	}
