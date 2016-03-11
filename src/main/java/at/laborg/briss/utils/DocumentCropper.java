@@ -50,21 +50,18 @@ public final class DocumentCropper {
 
 	public static File crop(final CropDefinition cropDefinition)
 			throws IOException, DocumentException, CropException {
-
 		// check if everything is ready
 		if (!BrissFileHandling.checkValidStateAndCreate(cropDefinition.getDestinationFile())) {
 			throw new IOException("Destination file not valid");
 		}
 		// check if file is encrypted and needs a password
 		if (isPasswordRequired(cropDefinition.getSourceFile())) {
-			throw new CropException("Password required to read source file");
+			throw new CropException("Password required to crop source file");
 		}
 		// read out necessary meta information
 		PdfMetaInformation pdfMetaInformation = new PdfMetaInformation(cropDefinition.getSourceFile());
-
 		// first make a copy containing the right amount of pages
 		File intermediatePdf = copyToMultiplePages(cropDefinition, pdfMetaInformation);
-
 		// now crop all pages according to their ratios
 		cropMultipliedFile(cropDefinition, intermediatePdf, pdfMetaInformation);
 		return cropDefinition.getDestinationFile();
@@ -72,8 +69,7 @@ public final class DocumentCropper {
 
 	private static File copyToMultiplePages(
 			final CropDefinition cropDefinition,
-			final PdfMetaInformation pdfMetaInformation) throws IOException,
-			DocumentException {
+			final PdfMetaInformation pdfMetaInformation) throws IOException, DocumentException {
 
 		PdfReader reader = new PdfReader(cropDefinition.getSourceFile().getAbsolutePath());
 		HashMap<String, String> map = SimpleNamedDestination.getNamedDestination(reader, false);
@@ -81,7 +77,6 @@ public final class DocumentCropper {
 		File resultFile = File.createTempFile("cropped", ".pdf");
 		PdfSmartCopy pdfCopy = new PdfSmartCopy(document, new FileOutputStream(resultFile));
 		document.open();
-
 		Map<Integer, List<String>> pageNrToDestinations = new HashMap<Integer, List<String>>();
 		for (String single : map.keySet()) {
 			StringTokenizer st = new StringTokenizer(map.get(single), " ");
@@ -98,7 +93,6 @@ public final class DocumentCropper {
 				}
 			}
 		}
-
 		int outputPageNumber = 0;
 		for (int pageNumber = 1; pageNumber <= pdfMetaInformation.getSourcePageCount(); pageNumber++) {
 			PdfImportedPage pdfPage = pdfCopy.getImportedPage(reader,pageNumber);
@@ -107,11 +101,9 @@ public final class DocumentCropper {
 			List<String> destinations = pageNrToDestinations.get(pageNumber);
 			if (destinations != null) {
 				for (String destination : destinations)
-					pdfCopy.addNamedDestination(destination, outputPageNumber,
-							new PdfDestination(PdfDestination.FIT));
+					pdfCopy.addNamedDestination(destination, outputPageNumber, new PdfDestination(PdfDestination.FIT));
 			}
-			List<Float[]> rectangles = cropDefinition
-					.getRectanglesForPage(pageNumber);
+			List<Float[]> rectangles = cropDefinition.getRectanglesForPage(pageNumber);
 			for (int j = 1; j < rectangles.size(); j++) {
 				pdfCopy.addPage(pdfPage);
 				outputPageNumber++;
@@ -127,53 +119,34 @@ public final class DocumentCropper {
 			final File multipliedDocument,
 			final PdfMetaInformation pdfMetaInformation)
 			throws DocumentException, IOException {
-
 		PdfReader reader = new PdfReader(multipliedDocument.getAbsolutePath());
-
-		PdfStamper stamper = new PdfStamper(reader, new FileOutputStream(
-				cropDefinition.getDestinationFile()));
+		PdfStamper stamper = new PdfStamper(reader, new FileOutputStream(cropDefinition.getDestinationFile()));
 		stamper.setMoreInfo(pdfMetaInformation.getSourceMetaInfo());
-
 		PdfDictionary pageDict;
 		int newPageNumber = 1;
 		int lastPageNumber = pdfMetaInformation.getSourcePageCount();  // continuously updated
-
-		for (int sourcePageNumber = 1; sourcePageNumber <= pdfMetaInformation
-				.getSourcePageCount(); sourcePageNumber++) {
-
-			List<Float[]> rectangleList = cropDefinition
-					.getRectanglesForPage(sourcePageNumber);
-
+		for (int sourcePageNumber = 1; sourcePageNumber <= pdfMetaInformation.getSourcePageCount(); sourcePageNumber++) {
+			List<Float[]> rectangleList = cropDefinition.getRectanglesForPage(sourcePageNumber);
 			// if no crop was selected do nothing
 			if (rectangleList.isEmpty()) {
 				newPageNumber++;
 				continue;
 			}
-
 			// references to pages 1 .. newPageNumber are already correct;
 			// since N new pages replace 1 old page,
 			// shift references to all subsequent pages by N-1
 			int[] range = new int[] { newPageNumber + 1, lastPageNumber };
-			SimpleBookmark.shiftPageNumbers(
-					pdfMetaInformation.getSourceBookmarks(),
-					rectangleList.size() - 1, range);
+			SimpleBookmark.shiftPageNumbers(pdfMetaInformation.getSourceBookmarks(), rectangleList.size() - 1, range);
 			for (Float[] ratios : rectangleList) {
-
 				pageDict = reader.getPageN(newPageNumber);
-
 				List<Rectangle> boxes = new ArrayList<Rectangle>();
 				boxes.add(reader.getBoxSize(newPageNumber, "media"));
 				boxes.add(reader.getBoxSize(newPageNumber, "crop"));
 				int rotation = reader.getPageRotation(newPageNumber);
-
-				Rectangle scaledBox = RectangleHandler
-						.calculateScaledRectangle(boxes, ratios, rotation);
-
+				Rectangle scaledBox = RectangleHandler.calculateScaledRectangle(boxes, ratios, rotation);
 				PdfArray scaleBoxArray = createScaledBoxArray(scaledBox);
-
 				pageDict.put(PdfName.CROPBOX, scaleBoxArray);
 				pageDict.put(PdfName.MEDIABOX, scaleBoxArray);
-				// increment the pagenumber
 				newPageNumber++;
 				lastPageNumber++;
 			}
@@ -192,7 +165,7 @@ public final class DocumentCropper {
 		return scaleBoxArray;
 	}
 
-	private static boolean isPasswordRequired(final File file)
+	public static boolean isPasswordRequired(final File file)
 			throws IOException {
 		PdfReader reader = new PdfReader(file.getAbsolutePath());
 		boolean isEncrypted = reader.isEncrypted();
@@ -212,7 +185,6 @@ public final class DocumentCropper {
 			this.sourceMetaInfo = reader.getInfo();
 			this.sourceBookmarks = SimpleBookmark.getBookmark(reader);
 			reader.close();
-
 		}
 
 		public int getSourcePageCount() {
@@ -226,6 +198,5 @@ public final class DocumentCropper {
 		public List<HashMap<String, Object>> getSourceBookmarks() {
 			return sourceBookmarks;
 		}
-
 	}
 }

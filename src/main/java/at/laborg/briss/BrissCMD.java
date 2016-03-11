@@ -19,7 +19,6 @@ package at.laborg.briss;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import at.laborg.briss.exception.CropException;
@@ -66,8 +65,8 @@ public final class BrissCMD {
 		System.out.println("Calculating crop rectangles.");
 		try {
 			for (PageCluster cluster : clusterDefinition.getClusterList()) {
-				Float[] auto = CropFinder.getAutoCropFloats(cluster.getImageData().getPreviewImage());
-				cluster.addRatios(auto);
+				Float[] auto = CropFinder.calcCropRatioOfImg(cluster.getImageData().getPreviewImage());
+				cluster.addCropRatio(auto);
 			}
 			CropDefinition cropDefintion = CropDefinition.createCropDefinition(
 					workDescription.getSourceFile(),
@@ -121,7 +120,7 @@ public final class BrissCMD {
 			for(int i = 0; i < clusterDefinition.getClusterList().size(); i++) {
 				List<Float[]> cluserrat = workDescription.getCrop().get(i);
 				for(Float[] cur : cluserrat) {
-					clusterDefinition.getClusterList().get(i).addRatios(cur);
+					clusterDefinition.getClusterList().get(i).addCropRatio(cur);
 				}
 			}
 			CropDefinition cropDefinition = CropDefinition.createCropDefinition(

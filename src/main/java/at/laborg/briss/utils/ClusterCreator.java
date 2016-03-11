@@ -37,6 +37,7 @@ public final class ClusterCreator {
 		PdfReader reader = new PdfReader(source.getAbsolutePath());
 		ClusterDefinition clusters = new ClusterDefinition();
 		for (int pgNum = 1; pgNum <= reader.getNumberOfPages(); pgNum++) {
+			// System.out.format( "page %d\n", pgNum );
 			Rectangle layoutBox = getLayoutBox(reader, pgNum);
 			PageCluster tmpCluster = new PageCluster(pgNum % 2 == 0,
 					(int) layoutBox.getWidth(),

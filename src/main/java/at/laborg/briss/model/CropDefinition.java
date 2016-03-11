@@ -54,7 +54,7 @@ public final class CropDefinition {
 				if (cropRectangles == null) {
 					cropRectangles = new ArrayList<Float[]>();
 				}
-				cropRectangles.addAll(cluster.getRatiosList());
+				cropRectangles.addAll(cluster.getCropRatioList());
 				pagesToCrops.put(pageNumber, cropRectangles);
 			}
 		}

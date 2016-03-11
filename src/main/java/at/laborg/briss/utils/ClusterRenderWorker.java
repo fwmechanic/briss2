@@ -17,8 +17,7 @@ public class ClusterRenderWorker extends Thread {
 	private final File source;
 	private final ClusterDefinition clusters;
 
-	public ClusterRenderWorker(final File source,
-			final ClusterDefinition clusters) {
+	public ClusterRenderWorker(final File source, final ClusterDefinition clusters) {
 		super();
 		this.source = source;
 		this.clusters = clusters;
@@ -28,12 +27,16 @@ public class ClusterRenderWorker extends Thread {
 	public final void run() {
 		PdfDecoder pdfDecoder = new PdfDecoder();
 		try {
+			// System.out.format( "ClusterRenderWorker: pdfDecoder.openPdfFile %s\n", source.getAbsolutePath() );
 			pdfDecoder.openPdfFile(source.getAbsolutePath());
+			// System.out.format( "ClusterRenderWorker: pdfDecoder.openPdfFile %s DONE\n", source.getAbsolutePath() );
 		} catch (PdfException e1) {
 			e1.printStackTrace();
 		}
+		int cnum = 0;
 		for (PageCluster cluster : clusters.getClusterList()) {
 			for (Integer pgNum : cluster.getPreviewPgNums()) {
+				// System.out.format( "ClusterRenderWorker: C%d P%d\n", cnum, pgNum );
 				// TODO jpedal isn't able to render big images
 				// correctly, so let's check if the image is big an
 				// throw it away
@@ -47,6 +50,7 @@ public class ClusterRenderWorker extends Thread {
 					e.printStackTrace();
 				}
 			}
+			++cnum;
 		}
 		// now close the reader as it's not used anymore
 		pdfDecoder.closePdfFile();

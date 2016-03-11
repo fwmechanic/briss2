@@ -78,10 +78,8 @@ public class ClusterImageData {
 					raster.setSample(w,h,0,1);
 			addImageToPreview(im);
 		}
-		BufferedImage outputImage = new BufferedImage(outputImageWidth,
-				outputImageHeight, BufferedImage.TYPE_BYTE_GRAY);
-		WritableRaster raster = outputImage.getRaster()
-				.createCompatibleWritableRaster();
+		BufferedImage outputImage = new BufferedImage(outputImageWidth, outputImageHeight, BufferedImage.TYPE_BYTE_GRAY);
+		WritableRaster raster = outputImage.getRaster().createCompatibleWritableRaster();
 		if (totalImages == 1) {
 			for (int i = 0; i < outputImage.getWidth(); ++i) {
 				for (int j = 0; j < outputImage.getHeight(); ++j) {
@@ -101,8 +99,7 @@ public class ClusterImageData {
 		return outputImage;
 	}
 
-	private static BufferedImage scaleImage(final BufferedImage bsrc, final int width,
-			final int height) {
+	private static BufferedImage scaleImage(final BufferedImage bsrc, final int width, final int height) {
 		BufferedImage bdest = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY);
 		Graphics2D g = bdest.createGraphics();
 		AffineTransform at = AffineTransform.getScaleInstance(
@@ -125,7 +122,7 @@ public class ClusterImageData {
 		Font font = new Font("Sansserif", Font.BOLD | Font.PLAIN, 22);
 		g2d.setFont(font);
 		g2d.setColor(Color.WHITE);
-		g2d.drawString("Image to Big!", 10, 110);
+		g2d.drawString("Image too Big!", 10, 110);
 		g2d.dispose();
 		return bimage;
 	}
@@ -157,7 +154,7 @@ public class ClusterImageData {
 			for (int j = 0; j < height; j++) {
 				for (int k = 0; k < imageCnt; k++) {
 					sum[i][j] += (imgdata[i][j][k] - mean[i][j])
-							* (imgdata[i][j][k] - mean[i][j]);
+							   * (imgdata[i][j][k] - mean[i][j]);
 				}
 			}
 		}

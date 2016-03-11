@@ -42,7 +42,7 @@ public class ClusterDefinition {
 	public final List<List<Float[]>> getAllRatios () {
 		List<List<Float[]>> result = new ArrayList<List<Float[]>> ();
 		for (PageCluster cluster : getClusterList()) {
-			result.add (new ArrayList<Float []> (cluster.getRatiosList()));
+			result.add (new ArrayList<Float []> (cluster.getCropRatioList()));
 		}
 		return result;
 	}

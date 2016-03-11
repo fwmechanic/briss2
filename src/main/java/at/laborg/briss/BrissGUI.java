@@ -114,20 +114,17 @@ public class BrissGUI extends JFrame implements ActionListener,
 	private static final String MOVE_DOWN = "Move down (selected)";
 	private static final String SELECT_ALL = "Select all";
 	private static final String SELECT_NONE = "Select none";
+	private static final String emCROP = "Error occurred while cropping";
+	private static final String emLOAD = "Error occurred while loading";
+	private static final String emRELOAD = "Error occurred while reloading";
 
 	private static final String DONATION_URI = "http://sourceforge.net/project/project_donations.php?group_id=320676";
 	private static final String RES_ICON_PATH = "/Briss_icon_032x032.gif";
 
 	private JPanel previewPanel;
 	private JProgressBar progressBar;
-	private JMenuItem cropButton,
-			maximizeWidthButton,
-			maximizeHeightButton, showPreviewButton,
-			excludePagesButton,
-			maximizeSizeButton, setSizeButton, setPositionButton,
-			moveLeftButton, moveRightButton, moveUpButton, moveDownButton,
-			selectAllButton, selectNoneButton;
 	private List<MergedPanel> mergedPanels = null;
+	private List<JMenuItem> conditionalMenuItems = new ArrayList<JMenuItem>();
 
 	private File lastOpenDir;
 
@@ -150,13 +147,22 @@ public class BrissGUI extends JFrame implements ActionListener,
 			try {
 				importNewPdfFile(fileArg);
 			} catch (IOException e) {
-				JOptionPane.showMessageDialog(this, e.getMessage(),
-						"Briss error", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(this, e.getMessage(), "Briss error", JOptionPane.ERROR_MESSAGE);
 			} catch (PdfException e) {
-				JOptionPane.showMessageDialog(this, e.getMessage(),
-						"Briss error", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(this, e.getMessage(), "Briss error", JOptionPane.ERROR_MESSAGE);
 			}
 		}
+	}
+
+	private JMenuItem newJMI(String st, boolean enable, int keyCode, int modifiers ) {
+		JMenuItem jmi = new JMenuItem(st, keyCode);
+		jmi.addActionListener(this);
+		jmi.setEnabled(enable);
+		jmi.setAccelerator(KeyStroke.getKeyStroke(keyCode, modifiers));
+		if( !enable ) {
+			conditionalMenuItems.add(jmi);
+		}
+		return jmi;
 	}
 
 	private void init() {
@@ -178,11 +184,7 @@ public class BrissGUI extends JFrame implements ActionListener,
 		menuBar.add(rectangleMenu);
 		menuBar.add(actionMenu);
 
-		JMenuItem loadButton = new JMenuItem(LOAD, KeyEvent.VK_L);
-		loadButton.addActionListener(this);
-		loadButton.setEnabled(true);
-		loadButton.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, 0));
-		fileMenu.add(loadButton);
+		fileMenu.add(newJMI(LOAD, true, KeyEvent.VK_L, 0));
 
 		fileMenu.addSeparator();
 
@@ -201,12 +203,7 @@ public class BrissGUI extends JFrame implements ActionListener,
 		JMenuItem openDonationLinkButton = new JMenuItem(DONATE);
 		openDonationLinkButton.addActionListener(this);
 		fileMenu.add(openDonationLinkButton);
-
-		excludePagesButton = new JMenuItem(EXCLUDE_OTHER_PAGES);
-		excludePagesButton.addActionListener(this);
-		excludePagesButton.setEnabled(false);
-		excludePagesButton.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, 0));
-		fileMenu.add(excludePagesButton);
+		fileMenu.add(newJMI(EXCLUDE_OTHER_PAGES, false, KeyEvent.VK_E, 0));
 
 		JMenuItem showHelpButton = new JMenuItem(HELP);
 		showHelpButton.addActionListener(this);
@@ -218,87 +215,22 @@ public class BrissGUI extends JFrame implements ActionListener,
 		menuItem.addActionListener(this);
 		fileMenu.add(menuItem);
 
-		cropButton = new JMenuItem(CROP, KeyEvent.VK_C);
-		cropButton.addActionListener(this);
-		cropButton.setEnabled(false);
-		cropButton.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, 0));
-		actionMenu.add(cropButton);
+		actionMenu.add(   newJMI(CROP           , false, KeyEvent.VK_C, 0));
+		actionMenu.add(   newJMI(PREVIEW        , false, KeyEvent.VK_P, 0));
 
-		showPreviewButton = new JMenuItem(PREVIEW, KeyEvent.VK_P);
-		showPreviewButton.addActionListener(this);
-		showPreviewButton.setEnabled(false);
-		showPreviewButton.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, 0));
-		actionMenu.add(showPreviewButton);
-
-		maximizeWidthButton = new JMenuItem(MAXIMIZE_WIDTH, KeyEvent.VK_W);
-		maximizeWidthButton.addActionListener(this);
-		maximizeWidthButton.setEnabled(false);
-		maximizeWidthButton.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, 0));
-		rectangleMenu.add(maximizeWidthButton);
-
-		maximizeHeightButton = new JMenuItem(MAXIMIZE_HEIGHT, KeyEvent.VK_H);
-		maximizeHeightButton.addActionListener(this);
-		maximizeHeightButton.setEnabled(false);
-		maximizeHeightButton.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H, 0));
-		rectangleMenu.add(maximizeHeightButton);
-
-		maximizeSizeButton = new JMenuItem(MAXIMIZE_SIZE, KeyEvent.VK_Z);
-		maximizeSizeButton.addActionListener(this);
-		maximizeSizeButton.setEnabled(false);
-		maximizeSizeButton.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, 0));
-		rectangleMenu.add(maximizeSizeButton);
-
-		setSizeButton = new JMenuItem(SET_SIZE, KeyEvent.VK_S);
-		setSizeButton.addActionListener(this);
-		setSizeButton.setEnabled(false);
-		setSizeButton.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, 0));
-		rectangleMenu.add(setSizeButton);
-
-		setPositionButton = new JMenuItem(SET_POSITION, KeyEvent.VK_O);
-		setPositionButton.addActionListener(this);
-		setPositionButton.setEnabled(false);
-		setPositionButton.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, 0));
-		rectangleMenu.add(setPositionButton);
-
+		rectangleMenu.add(newJMI(MAXIMIZE_WIDTH , false, KeyEvent.VK_W, 0));
+		rectangleMenu.add(newJMI(MAXIMIZE_HEIGHT, false, KeyEvent.VK_H, 0));
+		rectangleMenu.add(newJMI(MAXIMIZE_SIZE  , false, KeyEvent.VK_M, 0));
+		rectangleMenu.add(newJMI(SET_SIZE       , false, KeyEvent.VK_S, 0));
+		rectangleMenu.add(newJMI(SET_POSITION   , false, KeyEvent.VK_O, 0));
 		rectangleMenu.addSeparator();
-
-		moveLeftButton = new JMenuItem(MOVE_LEFT, KeyEvent.VK_LEFT);
-		moveLeftButton.addActionListener(this);
-		moveLeftButton.setEnabled(false);
-		moveLeftButton.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0));
-		rectangleMenu.add(moveLeftButton);
-
-		moveRightButton = new JMenuItem(MOVE_RIGHT, KeyEvent.VK_RIGHT);
-		moveRightButton.addActionListener(this);
-		moveRightButton.setEnabled(false);
-		moveRightButton.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0));
-		rectangleMenu.add(moveRightButton);
-
-		moveUpButton = new JMenuItem(MOVE_UP, KeyEvent.VK_UP);
-		moveUpButton.addActionListener(this);
-		moveUpButton.setEnabled(false);
-		moveUpButton.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0));
-		rectangleMenu.add(moveUpButton);
-
-		moveDownButton = new JMenuItem(MOVE_DOWN, KeyEvent.VK_DOWN);
-		moveDownButton.addActionListener(this);
-		moveDownButton.setEnabled(false);
-		moveDownButton.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0));
-		rectangleMenu.add(moveDownButton);
-
+		rectangleMenu.add(newJMI(MOVE_LEFT      , false, KeyEvent.VK_LEFT , 0));
+		rectangleMenu.add(newJMI(MOVE_RIGHT     , false, KeyEvent.VK_RIGHT, 0));
+		rectangleMenu.add(newJMI(MOVE_UP        , false, KeyEvent.VK_UP   , 0));
+		rectangleMenu.add(newJMI(MOVE_DOWN      , false, KeyEvent.VK_DOWN , 0));
 		rectangleMenu.addSeparator();
-
-		selectAllButton = new JMenuItem(SELECT_ALL, 0);
-		selectAllButton.addActionListener(this);
-		selectAllButton.setEnabled(false);
-		selectAllButton.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, 0));
-		rectangleMenu.add(selectAllButton);
-
-		selectNoneButton = new JMenuItem(SELECT_NONE, 0);
-		selectNoneButton.addActionListener(this);
-		selectNoneButton.setEnabled(false);
-		selectNoneButton.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, 0));
-		rectangleMenu.add(selectNoneButton);
+		rectangleMenu.add(newJMI(SELECT_ALL     , false, KeyEvent.VK_A, 0));
+		rectangleMenu.add(newJMI(SELECT_NONE    , false, KeyEvent.VK_N, 0));
 
 		setJMenuBar(menuBar);
 
@@ -345,19 +277,19 @@ public class BrissGUI extends JFrame implements ActionListener,
 		}
 	}
 
+	private static String lastUserExcludes = "";
 	private static PageExcludes getExcludedPages() {
-		String previousInput = "";
+		String previousInput = lastUserExcludes;
 		// repeat show_dialog until valid input or canceled
 		while (true) {
-			String input = JOptionPane.showInputDialog(
-					EXCLUDE_PAGES_DESCRIPTION, previousInput);
+			String input = JOptionPane.showInputDialog(EXCLUDE_PAGES_DESCRIPTION, previousInput);
 			previousInput = input;
-
 			if (input == null || input.equals(""))
 				return null;
-
 			try {
-				return new PageExcludes(PageNumberParser.parsePageNumber(input));
+				PageExcludes rv = new PageExcludes(PageNumberParser.parsePageNumber(input));
+				lastUserExcludes = input; // got past any ParseExecption, save for next time
+				return rv;
 			} catch (ParseException e) {
 				JOptionPane.showMessageDialog(null, e.getMessage(),
 						"Input Error", JOptionPane.ERROR_MESSAGE);
@@ -392,9 +324,7 @@ public class BrissGUI extends JFrame implements ActionListener,
 			try {
 				DesktopHelper.openDonationLink(DONATION_URI);
 			} catch (IOException e) {
-				JOptionPane.showMessageDialog(this, e.getMessage(),
-						"Error occurred while loading",
-						JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(this, e.getMessage(), emLOAD, JOptionPane.ERROR_MESSAGE);
 			}
 		} else if (action.getActionCommand().equals(EXIT)) {
 			System.exit(0);
@@ -413,13 +343,9 @@ public class BrissGUI extends JFrame implements ActionListener,
 				reloadWithOtherExcludes();
 				setTitle("BRISS - " + workingSet.getSourceFile().getName());
 			} catch (IOException e) {
-				JOptionPane.showMessageDialog(this, e.getMessage(),
-						"Error occurred while reloading",
-						JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(this, e.getMessage(), emRELOAD, JOptionPane.ERROR_MESSAGE);
 			} catch (PdfException e) {
-				JOptionPane.showMessageDialog(this, e.getMessage(),
-						"Error occurred while reloading",
-						JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(this, e.getMessage(), emRELOAD, JOptionPane.ERROR_MESSAGE);
 			}
 		} else if (action.getActionCommand().equals(LOAD)) {
 			File inputFile = getNewFileToCrop();
@@ -429,13 +355,9 @@ public class BrissGUI extends JFrame implements ActionListener,
 				importNewPdfFile(inputFile);
 				setTitle("BRISS - " + inputFile.getName());
 			} catch (IOException e) {
-				JOptionPane.showMessageDialog(this, e.getMessage(),
-						"Error occurred while loading",
-						JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(this, e.getMessage(), emLOAD, JOptionPane.ERROR_MESSAGE);
 			} catch (PdfException e) {
-				JOptionPane.showMessageDialog(this, e.getMessage(),
-						"Error occurred while loading",
-						JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(this, e.getMessage(), emLOAD, JOptionPane.ERROR_MESSAGE);
 			}
 		}
 		else if (action.getActionCommand().equals(SHOW_CROP)) {
@@ -462,17 +384,11 @@ public class BrissGUI extends JFrame implements ActionListener,
 					lastOpenDir = result.getParentFile();
 				}
 			} catch (IOException e) {
-				JOptionPane.showMessageDialog(this, e.getMessage(),
-						"Error occurred while cropping",
-						JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(this, e.getMessage(), emCROP, JOptionPane.ERROR_MESSAGE);
 			} catch (DocumentException e) {
-				JOptionPane.showMessageDialog(this, e.getMessage(),
-						"Error occurred while cropping",
-						JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(this, e.getMessage(), emCROP, JOptionPane.ERROR_MESSAGE);
 			} catch (CropException e) {
-				JOptionPane.showMessageDialog(this, e.getMessage(),
-						"Error occurred while cropping",
-						JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(this, e.getMessage(), emCROP, JOptionPane.ERROR_MESSAGE);
 			} finally {
 				setIdleState("");
 			}
@@ -482,17 +398,11 @@ public class BrissGUI extends JFrame implements ActionListener,
 				File result = createAndExecuteCropJobForPreview();
 				DesktopHelper.openFileWithDesktopApp(result);
 			} catch (IOException e) {
-				JOptionPane.showMessageDialog(this, e.getMessage(),
-						"Error occurred while cropping",
-						JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(this, e.getMessage(), emCROP, JOptionPane.ERROR_MESSAGE);
 			} catch (DocumentException e) {
-				JOptionPane.showMessageDialog(this, e.getMessage(),
-						"Error occurred while cropping",
-						JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(this, e.getMessage(), emCROP, JOptionPane.ERROR_MESSAGE);
 			} catch (CropException e) {
-				JOptionPane.showMessageDialog(this, e.getMessage(),
-						"Error occurred while cropping",
-						JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(this, e.getMessage(), emCROP, JOptionPane.ERROR_MESSAGE);
 			} finally {
 				setIdleState("");
 			}
@@ -514,8 +424,7 @@ public class BrissGUI extends JFrame implements ActionListener,
 	private File createAndExecuteCropJobForPreview() throws IOException, DocumentException, CropException {
 		File tmpCropFileDestination = File.createTempFile("briss", ".pdf");
 		CropDefinition cropDefinition = CropDefinition.createCropDefinition(
-				workingSet.getSourceFile(), tmpCropFileDestination,
-				workingSet.getClusterDefinition());
+				workingSet.getSourceFile(), tmpCropFileDestination, workingSet.getClusterDefinition());
 		return DocumentCropper.crop(cropDefinition);
 	}
 
@@ -524,8 +433,7 @@ public class BrissGUI extends JFrame implements ActionListener,
 		if (cropDestinationFile == null)
 			return null;
 		CropDefinition cropDefinition = CropDefinition.createCropDefinition(
-				workingSet.getSourceFile(), cropDestinationFile,
-				workingSet.getClusterDefinition());
+				workingSet.getSourceFile(), cropDestinationFile, workingSet.getClusterDefinition());
 		return DocumentCropper.crop(cropDefinition);
 	}
 
@@ -541,6 +449,11 @@ public class BrissGUI extends JFrame implements ActionListener,
 	}
 
 	void importNewPdfFile(File loadFile) throws IOException, PdfException {
+		// (ab)use of PdfException is admittedly hacky, but I want to preempt wasting
+		// time carefully cropping a file only to find out that it CANNOT be cropped!
+		if( DocumentCropper.isPasswordRequired(loadFile) ) {
+			throw new PdfException("Password required to crop source file");
+		}
 		lastOpenDir = loadFile.getParentFile();
 		previewPanel.removeAll();
 		progressBar.setString("Loading new file - Creating merged previews");
@@ -625,8 +538,7 @@ public class BrissGUI extends JFrame implements ActionListener,
 	private static int points_to_mm( int pts ) { return Math.round( pts * 25.4f / 72f); }
 
 	public void setDefinedSizeSelRects() {
-		// set size of selected rectangles
-		// based on user input
+		// set size of selected rectangles based on user input
 		String defInput = "";
 		// get maximum dimensions
 		int maxWidth = -1;
@@ -638,11 +550,9 @@ public class BrissGUI extends JFrame implements ActionListener,
 		if ((maxWidth >= 0) && (maxHeight >= 0)) {
 			maxWidth  = points_to_mm( maxWidth  );
 			maxHeight = points_to_mm( maxHeight );
-			defInput = Integer.toString(maxWidth) + " "
-					 + Integer.toString(maxHeight);
+			defInput = Integer.toString(maxWidth) + " " + Integer.toString(maxHeight);
 		}
-		// get user input
-		// maximums are used as a default
+		// get user input; maximums are used as a default
 		String input = JOptionPane.showInputDialog(SET_SIZE_DESCRIPTION, defInput);
 		if (input == null || input.equals("")) {
 			return;
@@ -667,8 +577,7 @@ public class BrissGUI extends JFrame implements ActionListener,
 	}
 
 	public void setPositionSelRects() {
-		// set position of selected rectangles
-		// based on user input
+		// set position of selected rectangles based on user input
 		String defInput = "";
 		// get minimums of positions
 		int minX = Integer.MAX_VALUE;
@@ -682,8 +591,7 @@ public class BrissGUI extends JFrame implements ActionListener,
 			minY = points_to_mm(minY);
 			defInput = Integer.toString(minX) + " " + Integer.toString(minY);
 		}
-		// get user input
-		// minimums are used as a default
+		// get user input; minimums are used as a default
 		String input = JOptionPane.showInputDialog(SET_POSITION_DESCRIPTION, defInput);
 		if (input == null || input.equals("")) {
 			return;
@@ -723,41 +631,32 @@ public class BrissGUI extends JFrame implements ActionListener,
 	private void createMergedPanels (boolean autoCrop) {
 		previewPanel.removeAll();
 		mergedPanels = new ArrayList<MergedPanel>();
-		for (PageCluster cluster : workingSet.getClusterDefinition()
-				.getClusterList()) {
+		for (PageCluster cluster : workingSet.getClusterDefinition().getClusterList()) {
 			MergedPanel mp = new MergedPanel(cluster, this, autoCrop);
 			previewPanel.add(mp);
 			mergedPanels.add(mp);
 		}
 		previewPanel.revalidate();
 	}
-	private void setStateAfterClusteringFinished(ClusterDefinition newClusters,
-			PageExcludes newPageExcludes, File newSource) {
+
+	private void EnableConditionalGuiButtons() {
+		for( JMenuItem jmi : conditionalMenuItems ) {
+			jmi.setEnabled(true);
+		}
+	}
+
+	private void setStateAfterClusteringFinished(ClusterDefinition newClusters, PageExcludes newPageExcludes, File newSource) {
 		updateWorkingSet(newClusters, newPageExcludes, newSource);
 		createMergedPanels (true);
 		progressBar.setString("Clustering and Rendering finished");
-		cropButton.setEnabled(true);
-		maximizeWidthButton.setEnabled(true);
-		maximizeHeightButton.setEnabled(true);
-		excludePagesButton.setEnabled(true);
-		showPreviewButton.setEnabled(true);
-		maximizeSizeButton.setEnabled(true);
-		setSizeButton.setEnabled(true);
-		setPositionButton.setEnabled(true);
-		moveLeftButton.setEnabled(true);
-		moveRightButton.setEnabled(true);
-		moveUpButton.setEnabled(true);
-		moveDownButton.setEnabled(true);
-		selectAllButton.setEnabled(true);
-		selectNoneButton.setEnabled(true);
+		EnableConditionalGuiButtons();
 		setIdleState("");
 		setExtendedState(Frame.MAXIMIZED_BOTH);
 		pack();
 		repaint();
 	}
 
-	private void updateWorkingSet(ClusterDefinition newClusters,
-			PageExcludes newPageExcludes, File newSource) {
+	private void updateWorkingSet(ClusterDefinition newClusters, PageExcludes newPageExcludes, File newSource) {
 		if (workingSet == null) {
 			// completely new
 			workingSet = new WorkingSet(newSource);
@@ -770,14 +669,12 @@ public class BrissGUI extends JFrame implements ActionListener,
 		workingSet.setPageExcludes(newPageExcludes);
 	}
 
-	private void copyCropsToClusters(ClusterDefinition oldClusters,
-			ClusterDefinition newClusters) {
-
+	private void copyCropsToClusters(ClusterDefinition oldClusters, ClusterDefinition newClusters) {
 		for (PageCluster newCluster : newClusters.getClusterList()) {
 			for (Integer pgNum : newCluster.getMemberPgNums()) {
 				PageCluster oldCluster = oldClusters.getClusterContainingPage(pgNum);
-				for (Float[] ratios : oldCluster.getRatiosList()) {
-					newCluster.addRatios(ratios);
+				for (Float[] ratios : oldCluster.getCropRatioList()) {
+					newCluster.addCropRatio(ratios);
 				}
 			}
 		}
@@ -803,12 +700,14 @@ public class BrissGUI extends JFrame implements ActionListener,
 		protected Void doInBackground() {
 			try {
 				clusterDefinition = ClusterCreator.clusterPages(source, pageExcludes);
+				// System.out.println( "ClusterCreator.clusterPages done" );
 			} catch (IOException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 				return null;
 			}
 			int totalWorkUnits = clusterDefinition.getNrOfPagesToRender();
+			// System.out.format( "clusterDefinition.getNrOfPagesToRender() = %d\n", totalWorkUnits );
 			ClusterRenderWorker renderWorker = new ClusterRenderWorker(source, clusterDefinition);
 			renderWorker.start();
 			while (renderWorker.isAlive()) {
@@ -830,12 +729,7 @@ public class BrissGUI extends JFrame implements ActionListener,
 		}
 	}
 
-	public void componentMoved(ComponentEvent e) {
-	}
-
-	public void componentShown(ComponentEvent e) {
-	}
-
-	public void componentHidden(ComponentEvent e) {
-	}
+	public void componentMoved(ComponentEvent e) {}
+	public void componentShown(ComponentEvent e) {}
+	public void componentHidden(ComponentEvent e) {}
 }

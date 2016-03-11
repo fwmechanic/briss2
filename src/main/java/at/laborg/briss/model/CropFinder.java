@@ -6,6 +6,8 @@ import java.awt.image.WritableRaster;
 public final class CropFinder {
 	private CropFinder() {}
 
+	// definition: CropRatio (singular noun): a Float [4] containing ratios that govern cropping
+
 	private static final double RATIO_LOOK_AHEAD_SATISFY = 0.85;
 	private static final int LOOK_AHEAD_PIXEL_NR = 30;
 	private static final int SD_CALC_SIZE_NR = 5;
@@ -18,8 +20,7 @@ public final class CropFinder {
 	public static final int ORIENTATION_RIGHT = 2;
 	public static final int ORIENTATION_BOTTOM = 3;
 
-	public static Float[] getAutoCropFloats(final BufferedImage image) {
-
+	public static Float[] calcCropRatioOfImg(final BufferedImage image) {
 		WritableRaster raster = image.getRaster();
 
 		double[] sumX = sumFrom2dTo1d(raster, X_AXIS);
@@ -31,23 +32,20 @@ public final class CropFinder {
 		double[] sdOfDerivationX = createSdOfDerivation(derivationX);
 		double[] sdOfDerivationY = createSdOfDerivation(derivationY);
 
-		int positionXLeft = findPosition(sdOfDerivationX, ORIENTATION_LEFT);
-		int positionYTop = findPosition(sdOfDerivationY, ORIENTATION_TOP);
-		int positionXRight = findPosition(sdOfDerivationX, ORIENTATION_RIGHT);
-		int positionYBottom = findPosition(sdOfDerivationY, ORIENTATION_BOTTOM);
+		int positionXLeft   = findPosition(sdOfDerivationX, ORIENTATION_LEFT   );
+		int positionYTop    = findPosition(sdOfDerivationY, ORIENTATION_TOP    );
+		int positionXRight  = findPosition(sdOfDerivationX, ORIENTATION_RIGHT  );
+		int positionYBottom = findPosition(sdOfDerivationY, ORIENTATION_BOTTOM );
 
 		Float[] result = new Float[4];
-		result[0] = (positionXLeft / (float) image.getWidth());
-		result[1] = ((image.getHeight() - positionYBottom) / (float) image
-				.getHeight());
-		result[2] = ((image.getWidth() - positionXRight) / (float) image
-				.getWidth());
-		result[3] = (positionYTop / (float) image.getHeight());
+		result[0] = (                     positionXLeft    / (float) image.getWidth() );
+		result[1] = ((image.getHeight() - positionYBottom) / (float) image.getHeight());
+		result[2] = ((image.getWidth()  - positionXRight ) / (float) image.getWidth() );
+		result[3] = (                     positionYTop     / (float) image.getHeight());
 		return result;
 	}
 
-	private static double[] sumFrom2dTo1d(final WritableRaster raster,
-			final int axis) {
+	private static double[] sumFrom2dTo1d(final WritableRaster raster, final int axis) {
 		if (axis == X_AXIS) {
 			double[] values = new double[raster.getWidth()];
 			for (int i = 0; i < raster.getWidth(); i++) {
@@ -82,10 +80,8 @@ public final class CropFinder {
 		return derivedValues;
 	}
 
-	private static int findPosition(final double[] sds,
-			final int orientationLeft) {
+	private static int findPosition(final double[] sds, final int orientationLeft) {
 		int position = 0;
-
 		switch (orientationLeft) {
 		case ORIENTATION_TOP:
 			for (int i = 0; i < sds.length - LOOK_AHEAD_PIXEL_NR; i++) {
@@ -130,9 +126,7 @@ public final class CropFinder {
 	}
 
 	private static double[] createSdOfDerivation(final double[] diffOut) {
-
 		double[] sds = new double[diffOut.length];
-
 		for (int i = 0; i < diffOut.length; i++) {
 			double[] tmp = new double[SD_CALC_SIZE_NR];
 			for (int j = 0; (j < tmp.length); j++) {
@@ -141,16 +135,13 @@ public final class CropFinder {
 				} else {
 					tmp[j] = 0;
 				}
-
 			}
 			sds[i] = sd(tmp);
 		}
 		return sds;
 	}
 
-	private static int diffCounter(final double[] values, final int start,
-			final int end) {
-
+	private static int diffCounter(final double[] values, final int start, final int end) {
 		int cnt = 0;
 		for (int i = start; i < end; i++) {
 			if (values[i] > SD_THRESHOLD_TO_BE_COUNTED) {
@@ -161,7 +152,6 @@ public final class CropFinder {
 	}
 
 	private static double sd(final double[] values) {
-		// get mean
 		double sum = 0;
 		for (double value : values) {
 			sum += value;
@@ -174,5 +164,4 @@ public final class CropFinder {
 		sd = Math.sqrt(sd / values.length);
 		return sd;
 	}
-
 }

@@ -26,7 +26,7 @@ public class ExportImportHelper {
 	// + "\n");
 	// for (SingleCluster cluster :
 	// clusterJob.getClusterCollection().getAsList()) {
-	// result.append(exportRatios(cluster.getRatiosList()) + "\n");
+	// result.append(exportRatios(cluster.getCropRatioList()) + "\n");
 	// }
 	// return result.toString();
 	// }

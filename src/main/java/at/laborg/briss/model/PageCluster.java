@@ -39,7 +39,7 @@ public class PageCluster implements Comparable<PageCluster> {
 	private final int roundedPgWidth;
 	private final int roundedPgHeight;
 
-	private static int roundedPgDim(int dim ) {
+	private static int roundPgDim( int dim ) {
 		int tmp = dim / MERGE_VARIABILITY;
 		return tmp * MERGE_VARIABILITY;
 	}
@@ -52,8 +52,8 @@ public class PageCluster implements Comparable<PageCluster> {
 	public PageCluster(final boolean isEvenPage, final int pageWidth, final int pageHeight,
 			final boolean excluded, final int pageNumber) {
 		super();
-		this.roundedPgWidth  = roundedPgDim( pageWidth  );
-		this.roundedPgHeight = roundedPgDim( pageHeight );
+		this.roundedPgWidth  = roundPgDim( pageWidth  );
+		this.roundedPgHeight = roundPgDim( pageHeight );
 		this.evenPage = isEvenPage;
 		this.excluded = excluded;
 		this.previewPgNums = new ArrayList<Integer>();
@@ -61,10 +61,28 @@ public class PageCluster implements Comparable<PageCluster> {
 		this.memberPgNums.add(pageNumber);
 	}
 
+	public String createToolTipText() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("<html>");
+		sb.append(isEvenPages() ? "Even " : "Odd ").append("page<br>");
+		sb.append(getMemberPgNums().size()); sb.append(" pages: ");
+		int pagecounter = 0;
+		for (Integer pgNum : getMemberPgNums()) {
+			sb.append(pgNum); sb.append(" ");
+			if (pagecounter++ > 10) {
+				pagecounter = 0;
+				sb.append("<br>");
+			}
+		}
+		sb.append("</html>");
+		return sb.toString();
+	}
+
+
+
 	public final ClusterImageData getImageData() {
 		if (imageData == null) {
-			imageData = new ClusterImageData(roundedPgWidth, roundedPgHeight,
-					previewPgNums.size());
+			imageData = new ClusterImageData(roundedPgWidth, roundedPgHeight, previewPgNums.size());
 		}
 		return imageData;
 	}
@@ -79,21 +97,21 @@ public class PageCluster implements Comparable<PageCluster> {
 	 * 
 	 * @return
 	 */
-	public final List<Float[]> getRatiosList() {
+	public final List<Float[]> getCropRatioList() {
 		return cropRatiosList;
 	}
 
 	public final void setRatiosList(final List<Float[]> ratiosList) {
 		clearRatios();
-		for (final Float[] ratios : ratiosList)
-			addRatios (ratios);
+		for (final Float[] ratio : ratiosList)
+			addCropRatio(ratio);
 	}
 
 	public final void clearRatios() {
 		cropRatiosList.clear();
 	}
 
-	public final void addRatios(final Float[] ratios) {
+	public final void addCropRatio(final Float[] ratios) {
 		// check if already in
 		if (!cropRatiosList.contains(ratios)) {
 			cropRatiosList.add(ratios);
@@ -127,8 +145,7 @@ public class PageCluster implements Comparable<PageCluster> {
 			float stepWidth = (float) memberPgNums.size() / MAX_MERGE_PAGES;
 			float totalStepped = 0;
 			for (int i = 0; i < MAX_MERGE_PAGES; i++) {
-				previewPgNums.add(memberPgNums.get(new Double(Math
-						.floor(totalStepped)).intValue()));
+				previewPgNums.add(memberPgNums.get(new Double(Math.floor(totalStepped)).intValue()));
 				totalStepped += stepWidth;
 			}
 		}

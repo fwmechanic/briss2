@@ -58,10 +58,22 @@
 	</build>
 
 <repositories>
+<!--
       <repository>
-        <id>clojars.org</id>
-        <url>http://clojars.org/repo</url>
+	<id>clojars.org</id>
+	<url>http://clojars.org/repo</url>
       </repository>
+-->
+      <repository>
+	<id>oritsh</id>
+	<url>http://www.oritsh.com/nexus/content/repositories/public</url>
+      </repository>
+<!--
+      <repository>
+	<id>globis.ethz.ch</id>
+	<url>http://maven.globis.ethz.ch/archiva/repository/globis-releases</url>
+      </repository>
+-->
       <repository>
        <id>geotoolkit</id>
        <url>http://maven.geotoolkit.org/</url>
@@ -84,8 +96,15 @@
 		<dependency>
 			<groupId>org.jpedal</groupId>
 			<artifactId>jpedal-lgpl</artifactId>
+			<version>4.92b23</version>
+		</dependency>
+<!--
+		<dependency>
+			<groupId>org.jpedal</groupId>
+			<artifactId>jpedal-lgpl</artifactId>
 			<version>4.74b27</version>
 		</dependency>
+-->
 <!--
      ***************************************************************
 	it seems likely that there will not be another release of

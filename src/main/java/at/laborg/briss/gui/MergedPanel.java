@@ -88,56 +88,51 @@ public class MergedPanel extends JPanel {
         
 	private final BrissGUI briss;
 
-	public MergedPanel(PageCluster cluster, BrissGUI briss, boolean addAutoRatios) {
+	public MergedPanel(PageCluster cluster_, BrissGUI briss_, boolean autoCrop) {
 		super();
-		this.briss = briss;
-		this.cluster = cluster;
-		this.img = cluster.getImageData().getPreviewImage();
-		if (addAutoRatios) {
-			Float[] autoRatios = CropFinder.getAutoCropFloats(img);
-			cluster.addRatios(autoRatios);
+		briss = briss_;
+		cluster = cluster_;
+		img = cluster.getImageData().getPreviewImage();
+		if (autoCrop) {
+			cluster.addCropRatio( CropFinder.calcCropRatioOfImg(img) );
 		}
-		setPreferredSize(new Dimension(img.getWidth(), img.getHeight()));
-		setSize(new Dimension(img.getWidth(), img.getHeight()));
+		setPreferredSize( new Dimension(img.getWidth(), img.getHeight()));
+		setSize(          new Dimension(img.getWidth(), img.getHeight()));
 		if (cluster.getImageData().isRenderable()) {
 			MergedPanelMouseAdapter mouseAdapter = new MergedPanelMouseAdapter();
 			addMouseMotionListener(mouseAdapter);
 			addMouseListener(mouseAdapter);
 		}
-		addRatiosAsCrops(cluster.getRatiosList());
-		setToolTipText(createInfoString(cluster));
+		xlatCropRatiosToCropRects();
+		setToolTipText( cluster.createToolTipText() );
+
 		addKeyListener(new MergedPanelKeyAdapter());
 		setFocusable(true);
 		requestFocusInWindow();
 		repaint();
 	}
 
-	private void addRatiosAsCrops(List<Float[]> ratiosList) {
-		for (Float[] ratios : cluster.getRatiosList()) {
+	private void xlatCropRatiosToCropRects() {
+		crops.clear();
+		for (Float[] ratios : cluster.getCropRatioList()) {
 			DrawableCropRect rect = new DrawableCropRect();
-			rect.x = (int) (img.getWidth()  * ratios[0]);
-			rect.y = (int) (img.getHeight() * ratios[3]);
+			rect.x      = (int) (img.getWidth()  * ratios[0]);
+			rect.y      = (int) (img.getHeight() * ratios[3]);
 			rect.width  = (int) (img.getWidth()  * (1 - (ratios[0] + ratios[2])));
 			rect.height = (int) (img.getHeight() * (1 - (ratios[1] + ratios[3])));
+			// System.out.format( "ratio2rect=img(x=%d,y=%d), rect(x=%d,y=%d)", img.getWidth(), img.getHeight(), rect.width, rect.height );
 			crops.add(rect);
 		}
+		// System.out.println( "" );
 	}
 
-	private String createInfoString(PageCluster cluster) {
-		StringBuilder sb = new StringBuilder();
-		sb.append("<html>");
-		sb.append(cluster.isEvenPages() ? "Even " : "Odd ").append("page<br>");
-		sb.append(cluster.getMemberPgNums().size()); sb.append(" pages: ");
-		int pagecounter = 0;
-		for (Integer pgNum : cluster.getMemberPgNums()) {
-			sb.append(pgNum); sb.append(" ");
-			if (pagecounter++ > 10) {
-				pagecounter = 0;
-				sb.append("<br>");
-			}
+	private void xlatCropRectsToCropRatios(List<DrawableCropRect> tmpCrops) {
+		cluster.clearRatios();
+		for (Rectangle crop : tmpCrops) {
+			// System.out.format( "rect2ratio=(x=%d,y=%d)", img.getWidth(), img.getHeight() );
+			cluster.addCropRatio( getCutRatiosForPdf(crop, img.getWidth(), img.getHeight()) );
 		}
-		sb.append("</html>");
-		return sb.toString();
+		// System.out.println( "" );
 	}
 
 	@Override
@@ -164,7 +159,7 @@ public class MergedPanel extends JPanel {
 		g2.dispose();
 	}
 
-	private Color rgba( int r, int g, int b, double a) {
+	private static Color rgba( int r, int g, int b, double a) {
 		// to allow direct pasting from https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Colors/Color_picker_tool
 		return new Color(r, g, b, (int)Math.ceil( 255*a ) );
 	}
@@ -272,7 +267,7 @@ public class MergedPanel extends JPanel {
 				crop.setSize( width, crop.height );
 			}
 		}
-		updateClusterRatios(crops);
+		xlatCropRectsToCropRatios(crops);
 		repaint();
 	}
 
@@ -282,7 +277,7 @@ public class MergedPanel extends JPanel {
 				crop.setSize( crop.width, height );
 			}
 		}
-		updateClusterRatios(crops);
+		xlatCropRectsToCropRatios(crops);
 		repaint();
 	}
 
@@ -292,7 +287,7 @@ public class MergedPanel extends JPanel {
 				crop.setSize( width, height );
 			}
 		}
-		updateClusterRatios(crops);
+		xlatCropRectsToCropRatios(crops);
 		repaint();
 	}
 
@@ -306,7 +301,7 @@ public class MergedPanel extends JPanel {
 				crop.setSize(crop.width + width, crop.height + height);
 			}
 		}
-		updateClusterRatios(crops);
+		xlatCropRectsToCropRatios(crops);
 		repaint();
 	}
 
@@ -314,7 +309,7 @@ public class MergedPanel extends JPanel {
 		for (DrawableCropRect crop : crops) {
 			crop.setSize(width, height);
 		}
-		updateClusterRatios(crops);
+		xlatCropRectsToCropRatios(crops);
 		repaint();
 	}
 
@@ -325,7 +320,7 @@ public class MergedPanel extends JPanel {
 			}
 		}
 		removeAnyCropEntirelyBeyondVisibleArea();
-		updateClusterRatios(crops);
+		xlatCropRectsToCropRatios(crops);
 		repaint();
 	}
 
@@ -335,7 +330,7 @@ public class MergedPanel extends JPanel {
 				crop.setLocation(x, y);
 			}
 		}
-		updateClusterRatios(crops);
+		xlatCropRectsToCropRatios(crops);
 		repaint();
 	}
 
@@ -344,13 +339,6 @@ public class MergedPanel extends JPanel {
 			crop.setSelected(select);
 		}
 		repaint();
-	}
-
-	private void updateClusterRatios(List<DrawableCropRect> tmpCrops) {
-		cluster.clearRatios();
-		for (Rectangle crop : tmpCrops) {
-			cluster.addRatios(getCutRatiosForPdf(crop, img.getWidth(), img.getHeight()));
-		}
 	}
 
 	/**
@@ -402,7 +390,7 @@ public class MergedPanel extends JPanel {
 				ClipBoard.getInstance().addCrop(crop);
 			}
 		}
-		updateClusterRatios(crops);
+		xlatCropRectsToCropRatios(crops);
 		repaint();
 	}
 
@@ -414,7 +402,7 @@ public class MergedPanel extends JPanel {
 			}
 		}
 		ClipBoard.getInstance().clear();
-		updateClusterRatios(crops);
+		xlatCropRectsToCropRatios(crops);
 		repaint();
 	}
 
@@ -435,7 +423,7 @@ public class MergedPanel extends JPanel {
 			}
 		}
 		crops.removeAll(removeList);
-		updateClusterRatios(crops);
+		xlatCropRectsToCropRatios(crops);
 		repaint();
 	}
 
@@ -577,7 +565,7 @@ public class MergedPanel extends JPanel {
 						break;
 					}
 				}
-				updateClusterRatios(crops);
+				xlatCropRectsToCropRatios(crops);
 				repaint();
 			} else if (PopUpMenuForCropRectangles.SPLIT.equals(e.getActionCommand())) {
 				Point pt = popUpMenuPoint;
@@ -620,7 +608,7 @@ public class MergedPanel extends JPanel {
 							iter.add(r);
 					}
 				}
-				updateClusterRatios(crops);
+				xlatCropRectsToCropRatios(crops);
 				repaint();
 			} else if (PopUpMenuForCropRectangles.SELECT_DESELECT.equals(e.getActionCommand())) {
 				toggleCropSelectionUnderPt(popUpMenuPoint);
@@ -636,17 +624,14 @@ public class MergedPanel extends JPanel {
 		@Override
 		public void mouseDragged(MouseEvent mE) {
 			Point curPoint = mE.getPoint();
-
 			switch (actionState) {
 			case DRAWING_NEW_CROP:
 				if (cropStartPoint == null) {
 					cropStartPoint = curPoint;
 				}
-				curCrop.x = (curPoint.x < cropStartPoint.x) ? curPoint.x
-						: cropStartPoint.x;
+				curCrop.x = (curPoint.x < cropStartPoint.x) ? curPoint.x : cropStartPoint.x;
 				curCrop.width = Math.abs(curPoint.x - cropStartPoint.x);
-				curCrop.y = (curPoint.y < cropStartPoint.y) ? curPoint.y
-						: cropStartPoint.y;
+				curCrop.y = (curPoint.y < cropStartPoint.y) ? curPoint.y : cropStartPoint.y;
 				curCrop.height = Math.abs(curPoint.y - cropStartPoint.y);
 				break;
 			case MOVE_CROP:
@@ -714,8 +699,7 @@ public class MergedPanel extends JPanel {
 				for (DrawableCropRect crop : crops) {
 					if (crop.containsInHotCornerUL(p)) {
 						actionState = ActionState.RESIZING_HOTCORNER_UL;
-						relativeHotCornerGrabDistance = new Point(crop.x - p.x,
-								crop.y - p.y);
+						relativeHotCornerGrabDistance = new Point(crop.x - p.x, crop.y - p.y);
 						curCrop = crop;
 						return;
 					}
@@ -724,8 +708,7 @@ public class MergedPanel extends JPanel {
 				for (DrawableCropRect crop : crops) {
 					if (crop.containsInHotCornerLR(p)) {
 						actionState = ActionState.RESIZING_HOTCORNER_LR;
-						relativeHotCornerGrabDistance = new Point(crop.x
-								+ crop.width - p.x, crop.y + crop.height - p.y);
+						relativeHotCornerGrabDistance = new Point(crop.x + crop.width - p.x, crop.y + crop.height - p.y);
 						curCrop = crop;
 						return;
 					}
@@ -755,7 +738,7 @@ public class MergedPanel extends JPanel {
 			}
 			clipCropsToVisibleArea();
 			removeTooSmallCrops();
-			updateClusterRatios(crops);
+			xlatCropRectsToCropRatios(crops);
 			actionState = ActionState.NOTHING;
 			cropStartPoint = null;
 			lastDragPoint = null;

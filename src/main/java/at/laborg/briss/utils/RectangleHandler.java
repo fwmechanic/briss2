@@ -32,19 +32,12 @@ public final class RectangleHandler {
 
 		// rotate the ratios according to the rotation of the page
 		float[] rotRatios = rotateRatios(ratios, rotation);
-
 		// use smallest box as basis for calculation
 		Rectangle scaledBox = new Rectangle(smallestBox);
-
-		scaledBox.setLeft(smallestBox.getLeft()
-				+ (smallestBox.getWidth() * rotRatios[0]));
-		scaledBox.setBottom(smallestBox.getBottom()
-				+ (smallestBox.getHeight() * rotRatios[1]));
-		scaledBox.setRight(smallestBox.getLeft()
-				+ (smallestBox.getWidth() * (1 - rotRatios[2])));
-		scaledBox.setTop(smallestBox.getBottom()
-				+ (smallestBox.getHeight() * (1 - rotRatios[3])));
-
+		scaledBox.setLeft(smallestBox.getLeft()     + (smallestBox.getWidth()  *      rotRatios[0]));
+		scaledBox.setBottom(smallestBox.getBottom() + (smallestBox.getHeight() *      rotRatios[1]));
+		scaledBox.setRight(smallestBox.getLeft()    + (smallestBox.getWidth()  * (1 - rotRatios[2])));
+		scaledBox.setTop(smallestBox.getBottom()    + (smallestBox.getHeight() * (1 - rotRatios[3])));
 		return scaledBox;
 	}
 
@@ -63,14 +56,10 @@ public final class RectangleHandler {
 		int tmpRotation = rotation;
 		while (tmpRotation > 0 && tmpRotation < 360) {
 			float tmpValue = tmpRatios[0];
-			// left
-			tmpRatios[0] = tmpRatios[1];
-			// bottom
-			tmpRatios[1] = tmpRatios[2];
-			// right
-			tmpRatios[2] = tmpRatios[3];
-			// top
-			tmpRatios[3] = tmpValue;
+			tmpRatios[0] = tmpRatios[1]; // left
+			tmpRatios[1] = tmpRatios[2]; // bottom
+			tmpRatios[2] = tmpRatios[3]; // right
+			tmpRatios[3] = tmpValue;     // top
 			tmpRotation += 90;
 		}
 		return tmpRatios;
