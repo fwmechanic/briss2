@@ -750,7 +750,7 @@ public class MergedPanel extends JPanel {
 				JMenuItem jmi = new JMenuItem(st);
 				jmi.addActionListener(MergedPanelMouseAdapter.this);
 				jmi.setEnabled( enable );
-				add(jmi);;
+				add(jmi);
 			}
 
 			public PopUpMenuForCropRectangles() {

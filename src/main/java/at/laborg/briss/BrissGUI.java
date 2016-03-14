@@ -288,7 +288,7 @@ public class BrissGUI extends JFrame implements ActionListener,
 				return null;
 			try {
 				PageExcludes rv = new PageExcludes(PageNumberParser.parsePageNumber(input));
-				lastUserExcludes = input; // got past any ParseExecption, save for next time
+				lastUserExcludes = input; // got past any ParseExeception, save for next time
 				return rv;
 			} catch (ParseException e) {
 				JOptionPane.showMessageDialog(null, e.getMessage(), "Input Error", JOptionPane.ERROR_MESSAGE);
