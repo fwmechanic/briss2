@@ -124,7 +124,7 @@ public class BrissGUI extends JFrame implements ActionListener,
 	private JPanel previewPanel;
 	private JProgressBar progressBar;
 	private List<MergedPanel> mergedPanels = null;
-	private List<JMenuItem> conditionalMenuItems = new ArrayList<JMenuItem>();
+	private List<JMenuItem> conditionalMenuItems = new ArrayList<>();
 
 	private File lastOpenDir;
 
@@ -146,9 +146,7 @@ public class BrissGUI extends JFrame implements ActionListener,
 				) {
 			try {
 				importNewPdfFile(fileArg);
-			} catch (IOException e) {
-				JOptionPane.showMessageDialog(this, e.getMessage(), "Briss error", JOptionPane.ERROR_MESSAGE);
-			} catch (PdfException e) {
+			} catch (IOException | PdfException e) {
 				JOptionPane.showMessageDialog(this, e.getMessage(), "Briss error", JOptionPane.ERROR_MESSAGE);
 			}
 		}
@@ -260,9 +258,7 @@ public class BrissGUI extends JFrame implements ActionListener,
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch (UnsupportedLookAndFeelException ex) {
 			System.out.println("Unable to load native look and feel");
-		} catch (ClassNotFoundException e) {
-		} catch (InstantiationException e) {
-		} catch (IllegalAccessException e) {
+		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
 		}
 	}
 
@@ -338,11 +334,10 @@ public class BrissGUI extends JFrame implements ActionListener,
 			try {
 				reloadWithOtherExcludes();
 				setTitle("BRISS - " + workingSet.getSourceFile().getName());
-			} catch (IOException e) {
+			} catch (IOException | PdfException e) {
 				JOptionPane.showMessageDialog(this, e.getMessage(), emRELOAD, JOptionPane.ERROR_MESSAGE);
-			} catch (PdfException e) {
-				JOptionPane.showMessageDialog(this, e.getMessage(), emRELOAD, JOptionPane.ERROR_MESSAGE);
-			} break;
+			}
+			break;
 		case LOAD:
 			File inputFile = getNewFileToCrop();
 			if (inputFile == null)
@@ -350,11 +345,10 @@ public class BrissGUI extends JFrame implements ActionListener,
 			try {
 				importNewPdfFile(inputFile);
 				setTitle("BRISS - " + inputFile.getName());
-			} catch (IOException e) {
+			} catch (IOException | PdfException e) {
 				JOptionPane.showMessageDialog(this, e.getMessage(), emLOAD, JOptionPane.ERROR_MESSAGE);
-			} catch (PdfException e) {
-				JOptionPane.showMessageDialog(this, e.getMessage(), emLOAD, JOptionPane.ERROR_MESSAGE);
-			} break;
+			}
+			break;
 		case SHOW_CROP: {
 			ClusterDefinition clusters = workingSet.getClusterDefinition();
 			JOptionPane.showInputDialog(this, "Crop Option: ", CropParser.cropToString(clusters.getAllRatios()));
@@ -378,11 +372,7 @@ public class BrissGUI extends JFrame implements ActionListener,
 					DesktopHelper.openFileWithDesktopApp(result);
 					lastOpenDir = result.getParentFile();
 				}
-			} catch (IOException e) {
-				JOptionPane.showMessageDialog(this, e.getMessage(), emCROP, JOptionPane.ERROR_MESSAGE);
-			} catch (DocumentException e) {
-				JOptionPane.showMessageDialog(this, e.getMessage(), emCROP, JOptionPane.ERROR_MESSAGE);
-			} catch (CropException e) {
+			} catch (IOException | DocumentException | CropException e) {
 				JOptionPane.showMessageDialog(this, e.getMessage(), emCROP, JOptionPane.ERROR_MESSAGE);
 			} finally {
 				setIdleState("");
@@ -392,11 +382,7 @@ public class BrissGUI extends JFrame implements ActionListener,
 				setWorkingState("Creating and showing preview...");
 				File result = createAndExecuteCropJobForPreview();
 				DesktopHelper.openFileWithDesktopApp(result);
-			} catch (IOException e) {
-				JOptionPane.showMessageDialog(this, e.getMessage(), emCROP, JOptionPane.ERROR_MESSAGE);
-			} catch (DocumentException e) {
-				JOptionPane.showMessageDialog(this, e.getMessage(), emCROP, JOptionPane.ERROR_MESSAGE);
-			} catch (CropException e) {
+			} catch (IOException | DocumentException | CropException e) {
 				JOptionPane.showMessageDialog(this, e.getMessage(), emCROP, JOptionPane.ERROR_MESSAGE);
 			} finally {
 				setIdleState("");
@@ -531,7 +517,7 @@ public class BrissGUI extends JFrame implements ActionListener,
 	private static int mm_to_points( int mm  ) { return Math.round( mm  * 72f / 25.4f); }
 	private static int points_to_mm( int pts ) { return Math.round( pts * 25.4f / 72f); }
 
-	public void setDefinedSizeSelRects() {
+	private void setDefinedSizeSelRects() {
 		// set size of selected rectangles based on user input
 		String defInput = "";
 		// get maximum dimensions
@@ -570,7 +556,7 @@ public class BrissGUI extends JFrame implements ActionListener,
 		}
 	}
 
-	public void setPositionSelRects() {
+	private void setPositionSelRects() {
 		// set position of selected rectangles based on user input
 		String defInput = "";
 		// get minimums of positions
@@ -624,7 +610,7 @@ public class BrissGUI extends JFrame implements ActionListener,
 
 	private void createMergedPanels (boolean autoCrop) {
 		previewPanel.removeAll();
-		mergedPanels = new ArrayList<MergedPanel>();
+		mergedPanels = new ArrayList<>();
 		for (PageCluster cluster : workingSet.getClusterDefinition().getClusterList()) {
 			MergedPanel mp = new MergedPanel(cluster, this, autoCrop);
 			previewPanel.add(mp);
@@ -666,9 +652,7 @@ public class BrissGUI extends JFrame implements ActionListener,
 		for (PageCluster newCluster : newClusters.getClusterList()) {
 			for (Integer pgNum : newCluster.getMemberPgNums()) {
 				PageCluster oldCluster = oldClusters.getClusterContainingPage(pgNum);
-				for (Float[] ratios : oldCluster.getCropRatioList()) {
-					newCluster.addCropRatio(ratios);
-				}
+				oldCluster.getCropRatioList().forEach(newCluster::addCropRatio);
 			}
 		}
 	}

@@ -74,14 +74,8 @@ public final class BrissCMD {
 			System.out.println("Starting to crop files.");
 			DocumentCropper.crop(cropDefintion);
 			System.out.println("Successfully cropped to:" + workDescription.getDestFile().getAbsolutePath());
-		} catch (IOException e) {
+		} catch (IOException | IllegalArgumentException | CropException | DocumentException e) {
 			e.printStackTrace();
-		} catch (IllegalArgumentException e) {
-			e.printStackTrace();
-		} catch (DocumentException e) {
-			e.printStackTrace();
-		} catch (CropException e) {
-			System.out.println("Error while cropping:" + e.getMessage());
 		}
 	}
 
@@ -129,14 +123,8 @@ public final class BrissCMD {
 			System.out.println("Starting to crop files.");
 			DocumentCropper.crop(cropDefinition);
 			System.out.println("Successfully cropped to:" + workDescription.getDestFile().getAbsolutePath());
-		} catch (IOException e) {
+		} catch (IOException | IllegalArgumentException | CropException | DocumentException e) {
 			e.printStackTrace();
-		} catch (IllegalArgumentException e) {
-			e.printStackTrace();
-		} catch (DocumentException e) {
-			e.printStackTrace();
-		} catch (CropException e) {
-			System.out.println("Error while cropping:" + e.getMessage());
 		}
 	}
 

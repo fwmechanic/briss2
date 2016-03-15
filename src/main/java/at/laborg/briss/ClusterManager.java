@@ -31,7 +31,7 @@ import at.laborg.briss.model.SingleCluster;
 import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.PdfReader;
 
-public class ClusterManager {
+class ClusterManager {
 
 	public static ClusterJob createClusterJob(File origFile)
 			throws IOException, PdfException {

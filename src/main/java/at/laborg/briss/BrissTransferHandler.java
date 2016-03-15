@@ -81,10 +81,7 @@ final class BrissTransferHandler extends TransferHandler {
 				}
 			}
 
-		} catch (UnsupportedFlavorException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
+		} catch (UnsupportedFlavorException | IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

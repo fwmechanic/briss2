@@ -129,7 +129,7 @@ public class CropManager {
 
 				pageDict = reader.getPageN(newPageNumber);
 
-				List<Rectangle> boxes = new ArrayList<Rectangle>();
+				List<Rectangle> boxes = new ArrayList<>();
 				boxes.add(reader.getBoxSize(newPageNumber, "media"));
 				boxes.add(reader.getBoxSize(newPageNumber, "crop"));
 				int rotation = reader.getPageRotation(newPageNumber);

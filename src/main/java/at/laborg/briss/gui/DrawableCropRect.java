@@ -20,8 +20,8 @@ public class DrawableCropRect extends Rectangle {
 	public DrawableCropRect(int x, int y, int w, int h)  { super(     x,      y,      w,          h     ); }
 	
 	public final List<DrawableCropRect> split (List<Integer> at, int olap2 /* half-overlap */, boolean onX) {
-		List<DrawableCropRect> result = new ArrayList<DrawableCropRect> ();
-		at = new ArrayList<Integer> (at);
+		List<DrawableCropRect> result = new ArrayList<>();
+		at = new ArrayList<>(at);
 		// first and last rectangle have extra overlap
 		int prev = (onX ? x : y) + olap2;
 		at.add((onX ? x + width : y + height) - olap2);

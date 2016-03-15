@@ -44,7 +44,7 @@ public class PageCluster implements Comparable<PageCluster> {
 		return tmp * MERGE_VARIABILITY;
 	}
 
-	private final List<Float[]> cropRatiosList = new ArrayList<Float[]>();
+	private final List<Float[]> cropRatiosList = new ArrayList<>();
 	private boolean excluded = false;
 	private ClusterImageData imageData;
 	private final boolean evenPage;
@@ -56,8 +56,8 @@ public class PageCluster implements Comparable<PageCluster> {
 		this.roundedPgHeight = roundPgDim( pageHeight );
 		this.evenPage = isEvenPage;
 		this.excluded = excluded;
-		this.previewPgNums = new ArrayList<Integer>();
-		this.memberPgNums = new ArrayList<Integer>();
+		this.previewPgNums = new ArrayList<>();
+		this.memberPgNums = new ArrayList<>();
 		this.memberPgNums.add(pageNumber);
 	}
 
@@ -103,8 +103,7 @@ public class PageCluster implements Comparable<PageCluster> {
 
 	public final void setRatiosList(final List<Float[]> ratiosList) {
 		clearRatios();
-		for (final Float[] ratio : ratiosList)
-			addCropRatio(ratio);
+		ratiosList.forEach(this::addCropRatio);
 	}
 
 	public final void clearRatios() {

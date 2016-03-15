@@ -7,7 +7,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 
-public class ClusterConfigurationDialog extends JDialog {
+class ClusterConfigurationDialog extends JDialog {
 
 	private static final long serialVersionUID = -918825385363863390L;
 	private static final String EVEN_ODD_QUESTION = "Cluster even and odd pages differently";
@@ -22,12 +22,6 @@ public class ClusterConfigurationDialog extends JDialog {
 		JButton okButton = new JButton(OK_STRING);
 		this.add(evenAndOddChecker);
 		this.add(okButton);
-		okButton.addActionListener(new ActionListener() {
-			public void actionPerformed(final ActionEvent e) {
-				okPressed();
-			}
-		});
+		okButton.addActionListener(e -> {} );
 	}
-
-	private void okPressed() {}
 }

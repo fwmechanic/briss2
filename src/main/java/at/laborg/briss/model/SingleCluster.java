@@ -28,7 +28,7 @@ public class SingleCluster implements Comparable<SingleCluster> {
 
 	private List<Integer> pagesToMerge;
 	private List<Integer> allPages;
-	private final List<Float[]> cropRatiosList = new ArrayList<Float[]>();
+	private final List<Float[]> cropRatiosList = new ArrayList<>();
 
 	
 	private ClusterImageData imageData;
@@ -45,7 +45,7 @@ public class SingleCluster implements Comparable<SingleCluster> {
 		this.pageHeight = pageHeight;
 		this.evenPage = isEvenPage;
 		this.excludedPageNumber = excludedPageNumber;
-		this.pagesToMerge = new ArrayList<Integer>();
+		this.pagesToMerge = new ArrayList<>();
 	}
 
 	

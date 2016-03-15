@@ -51,7 +51,7 @@ public final class PageNumberParser {
 		// now tokenize by ;
 		StringTokenizer tokenizer = new StringTokenizer(input, ";");
 
-		Set<Integer> pNS = new HashSet<Integer>();
+		Set<Integer> pNS = new HashSet<>();
 		while (tokenizer.hasMoreElements()) {
 			pNS.addAll(extractPageNumbers(tokenizer.nextToken()));
 		}
@@ -63,7 +63,7 @@ public final class PageNumberParser {
 			throws ParseException {
 
 		StringTokenizer tokenizer = new StringTokenizer(input, "-");
-		Set<Integer> returnSet = new HashSet<Integer>();
+		Set<Integer> returnSet = new HashSet<>();
 		if (tokenizer.countTokens() == 1) {
 			// it's only a number, lets parse it
 			Integer pageNumber = Integer.parseInt(input);

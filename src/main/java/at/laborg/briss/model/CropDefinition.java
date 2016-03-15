@@ -46,13 +46,13 @@ public final class CropDefinition {
 			throw new IllegalArgumentException("Source("
 					+ source.getAbsolutePath() + ") file doesn't exist");
 
-		HashMap<Integer, List<Float[]>> pagesToCrops = new HashMap<Integer, List<Float[]>>();
+		HashMap<Integer, List<Float[]>> pagesToCrops = new HashMap<>();
 
 		for (PageCluster cluster : clusters.getClusterList()) {
 			for (Integer pageNumber : cluster.getMemberPgNums()) {
 				List<Float[]> cropRectangles = pagesToCrops.get(pageNumber);
 				if (cropRectangles == null) {
-					cropRectangles = new ArrayList<Float[]>();
+					cropRectangles = new ArrayList<>();
 				}
 				cropRectangles.addAll(cluster.getCropRatioList());
 				pagesToCrops.put(pageNumber, cropRectangles);

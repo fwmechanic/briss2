@@ -21,13 +21,9 @@ public final class AutoCropTest {
 				+ File.separatorChar + new Date().toString());
 		outputDirectory.mkdir();
 
-		for (File file : wd.listFiles(new FileFilter() {
-
-			public boolean accept(final File file) {
-				return file.getAbsolutePath().toLowerCase().endsWith(".pdf");
-			}
-
-		})) {
+		for (File file : wd.listFiles(file1 -> {
+            return file1.getAbsolutePath().toLowerCase().endsWith(".pdf");
+        })) {
 			String[] jobargs = new String[4];
 			jobargs[0] = "-s";
 			jobargs[1] = file.getAbsolutePath();

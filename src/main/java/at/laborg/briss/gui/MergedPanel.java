@@ -41,6 +41,7 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.stream.Collectors;
 
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -79,7 +80,7 @@ public class MergedPanel extends JPanel {
 
 	private final PageCluster cluster;
 
-	private final List<DrawableCropRect> crops = new ArrayList<DrawableCropRect>();
+	private final List<DrawableCropRect> crops = new ArrayList<>();
 	private final BufferedImage img;
 
 	private enum ActionState {
@@ -262,31 +263,19 @@ public class MergedPanel extends JPanel {
 	}
 
 	public void selCropsSetWidth(int width) {
-		for (DrawableCropRect crop : crops) {
-			if (crop.isSelected()) {
-				crop.setSize( width, crop.height );
-			}
-		}
+		crops.stream().filter(DrawableCropRect::isSelected).forEach(crop -> crop.setSize(width, crop.height));
 		xlatCropRectsToCropRatios(crops);
 		repaint();
 	}
 
 	public void selCropsSetHeight(int height) {
-		for (DrawableCropRect crop : crops) {
-			if (crop.isSelected()) {
-				crop.setSize( crop.width, height );
-			}
-		}
+		crops.stream().filter(DrawableCropRect::isSelected).forEach(crop -> crop.setSize(crop.width, height));
 		xlatCropRectsToCropRatios(crops);
 		repaint();
 	}
 
 	public void selCropsSetSize(int width, int height) {
-		for (DrawableCropRect crop : crops) {
-			if (crop.isSelected()) {
-				crop.setSize( width, height );
-			}
-		}
+		crops.stream().filter(DrawableCropRect::isSelected).forEach(crop -> crop.setSize(width, height));
 		xlatCropRectsToCropRatios(crops);
 		repaint();
 	}
@@ -314,22 +303,14 @@ public class MergedPanel extends JPanel {
 	}
 
 	public void selCropsMoveRelative(int x, int y) {
-		for (DrawableCropRect crop : crops) {
-			if (crop.isSelected()) {
-				crop.translate(x, y);
-			}
-		}
+		crops.stream().filter(DrawableCropRect::isSelected).forEach(crop -> crop.translate(x, y));
 		removeAnyCropEntirelyBeyondVisibleArea();
 		xlatCropRectsToCropRatios(crops);
 		repaint();
 	}
 
 	public void selCropsMoveAbsolute(int x, int y) {
-		for (DrawableCropRect crop : crops) {
-			if (crop.isSelected()) {
-				crop.setLocation(x, y);
-			}
-		}
+		crops.stream().filter(DrawableCropRect::isSelected).forEach(crop -> crop.setLocation(x, y));
 		xlatCropRectsToCropRatios(crops);
 		repaint();
 	}
@@ -385,22 +366,13 @@ public class MergedPanel extends JPanel {
 
 	private void copyToClipBoard() {
 		ClipBoard.getInstance().clear();
-		for (DrawableCropRect crop : crops) {
-			if (crop.isSelected()) {
-				ClipBoard.getInstance().addCrop(crop);
-			}
-		}
+		crops.stream().filter(DrawableCropRect::isSelected).forEach(crop -> ClipBoard.getInstance().addCrop(crop));
 		xlatCropRectsToCropRatios(crops);
 		repaint();
 	}
 
 	private void pasteFromClipBoard() {
-		for (DrawableCropRect crop : ClipBoard.getInstance().getCrops()) {
-			if (!crops.contains(crop)) {
-				DrawableCropRect newCrop = new DrawableCropRect(crop);
-				crops.add(newCrop);
-			}
-		}
+		ClipBoard.getInstance().getCrops().stream().filter(crop -> !crops.contains(crop)).forEach(crop -> crops.add(new DrawableCropRect(crop)));
 		ClipBoard.getInstance().clear();
 		xlatCropRectsToCropRatios(crops);
 		repaint();
@@ -416,12 +388,7 @@ public class MergedPanel extends JPanel {
 	}
 
 	private void deleteAllSelected() {
-		List<DrawableCropRect> removeList = new ArrayList<DrawableCropRect>();
-		for (DrawableCropRect crop : crops) {
-			if (crop.isSelected()) {
-				removeList.add(crop);
-			}
-		}
+		List<DrawableCropRect> removeList = crops.stream().filter(DrawableCropRect::isSelected).collect(Collectors.toList());
 		crops.removeAll(removeList);
 		xlatCropRectsToCropRatios(crops);
 		repaint();
@@ -438,13 +405,14 @@ public class MergedPanel extends JPanel {
 				- but if crop sizes have been molested by the move, this becomes an onerous chore
 				- so don't molest his crops' sizes until he has "driven them off the cliff"
 		 */
-		List<Rectangle> cropsToTrash = new ArrayList<Rectangle>();
+/*
+		List<Rectangle> cropsToTrash = new ArrayList<>();
 		for (Rectangle crop : crops) {
 			int ulcX = crop.x;
 			int ulcY = crop.y;
 			int lrcX = ulcX + crop.width;
 			int lrcY = ulcY + crop.height;
-			if (	   lrcY <= 0
+			if (lrcY <= 0
 					|| lrcX <= 0
 					|| ulcX >= getWidth()
 					|| ulcY >= getHeight()
@@ -453,6 +421,19 @@ public class MergedPanel extends JPanel {
 			}
 		}
 		crops.removeAll(cropsToTrash);
+*/
+
+		crops.removeIf(item -> {
+			int ulcX = item.x;
+			int ulcY = item.y;
+			int lrcX = ulcX + item.width;
+			int lrcY = ulcY + item.height;
+			return	   lrcY <= 0
+					|| lrcX <= 0
+					|| ulcX >= getWidth()
+					|| ulcY >= getHeight()
+					;
+		});
 	}
 
 	private void clipCropsToVisibleArea() {
@@ -477,14 +458,16 @@ public class MergedPanel extends JPanel {
 
 	private void removeTooSmallCrops() {
 		// throw away all crops which are too small
-		List<Rectangle> cropsToTrash = new ArrayList<Rectangle>();
-		for (Rectangle crop : crops) {
-			if (   crop.getWidth()  < 2 * DrawableCropRect.CORNER_DIMENSION
-				|| crop.getHeight() < 2 * DrawableCropRect.CORNER_DIMENSION) {
-				cropsToTrash.add(crop);
-			}
-		}
+/*
+		List<Rectangle> cropsToTrash = crops.stream().filter(crop ->
+				   crop.getWidth()  < 2 * DrawableCropRect.CORNER_DIMENSION
+				|| crop.getHeight() < 2 * DrawableCropRect.CORNER_DIMENSION).collect(Collectors.toList());
 		crops.removeAll(cropsToTrash);
+*/
+		crops.removeIf(crop -> { return
+			   crop.getWidth()  < 2 * DrawableCropRect.CORNER_DIMENSION
+			|| crop.getHeight() < 2 * DrawableCropRect.CORNER_DIMENSION;
+		} );
 	}
 
 	private class MergedPanelKeyAdapter extends KeyAdapter {
@@ -548,12 +531,14 @@ public class MergedPanel extends JPanel {
 		public void actionPerformed(ActionEvent e) {
 			switch( e.getActionCommand() ) {
 			case PopUpMenuForCropRectangles.DELETE: {
-				for (Rectangle crop : crops) {
+				crops.removeIf( crop -> {return crop.contains(popUpMenuPoint); } );
+/*				for (Rectangle crop : crops) {
 					if (crop.contains(popUpMenuPoint)) {
 						crops.remove(crop);
 						break;
 					}
 				}
+*/
 				xlatCropRectsToCropRatios(crops);
 				repaint();
 				} break;
@@ -583,7 +568,7 @@ public class MergedPanel extends JPanel {
 				for (ListIterator<DrawableCropRect> iter = crops.listIterator(); iter.hasNext(); ) {
 					DrawableCropRect crop = iter.next();
 					if (crop.contains(pt)) {
-						List<Integer> splits = new ArrayList<Integer>();
+						List<Integer> splits = new ArrayList<>();
 						if (optionAtPoint == 0)
 							splits.add(optionHOrV == 0 ? pt.x : pt.y);
 						else {
@@ -594,8 +579,7 @@ public class MergedPanel extends JPanel {
 						}
 						List<DrawableCropRect> rs = crop.split(splits, overlap, optionHOrV == 0);
 						iter.remove();
-						for (DrawableCropRect r : rs)
-							iter.add(r);
+						rs.forEach(iter::add);
 					}
 				}
 				xlatCropRectsToCropRatios(crops);

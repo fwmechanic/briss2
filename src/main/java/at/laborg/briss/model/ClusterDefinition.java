@@ -19,13 +19,14 @@ package at.laborg.briss.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ClusterDefinition {
 	/*
 	   a list of PageClusters
 	 */
 
-	private final List<PageCluster> clusters = new ArrayList<PageCluster>();
+	private final List<PageCluster> clusters = new ArrayList<>();
 
 	public final PageCluster getClusterContainingPage(final int pgNum) {
 		for (PageCluster cluster : clusters) {
@@ -40,10 +41,7 @@ public class ClusterDefinition {
 	}
 
 	public final List<List<Float[]>> getAllRatios () {
-		List<List<Float[]>> result = new ArrayList<List<Float[]>> ();
-		for (PageCluster cluster : getClusterList()) {
-			result.add (new ArrayList<Float []> (cluster.getCropRatioList()));
-		}
+		List<List<Float[]>> result = getClusterList().stream().map(cluster -> new ArrayList<>(cluster.getCropRatioList())).collect(Collectors.toList());
 		return result;
 	}
 
@@ -58,9 +56,7 @@ public class ClusterDefinition {
 	}
 
 	public final void designatePreviewPages() {
-		for (PageCluster cluster : clusters) {
-			cluster.designatePreviewPages();
-		}
+		clusters.forEach(PageCluster::designatePreviewPages);
 	}
 
 	public final int getNrOfPagesToRender() {

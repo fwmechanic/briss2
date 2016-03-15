@@ -5,9 +5,9 @@ import java.util.List;
 
 public class CropParser {
 	public static List<List<Float[]>> parse (String string) {
-		List<List<Float[]>> crop = new ArrayList<List<Float[]>>();
+		List<List<Float[]>> crop = new ArrayList<>();
 		for(String page : string.split(":")) {
-			List<Float[]> pageratios = new ArrayList<Float[]>();
+			List<Float[]> pageratios = new ArrayList<>();
 			crop.add(pageratios);
 			for(String part : page.split(",")) {
 				String[] parts = part.split("/");
