@@ -43,34 +43,26 @@ class ClusterManager {
 	}
 
 	public static void clusterPages(ClusterJob clusterJob) throws IOException {
-		PdfReader reader = new PdfReader(clusterJob.getSource()
-				.getAbsolutePath());
-
+		PdfReader reader = new PdfReader(clusterJob.getSource().getAbsolutePath());
 		ClusterCollection clusters=clusterJob.getClusterCollection();
 		for (int page = 1; page <= reader.getNumberOfPages(); page++) {
 			Rectangle layoutBox = reader.getBoxSize(page, "crop");
-
 			if (layoutBox == null) {
 				layoutBox = reader.getBoxSize(page, "media");
 			}
-
 			// create Cluster
 			// if the pagenumber should be excluded then use it as a
 			// discriminating parameter, else use default value
-
 			int pageNumber = -1;
 			if (clusterJob.getExcludedPageSet() != null
 					&& clusterJob.getExcludedPageSet().contains(page)) {
 				pageNumber = page;
 			}
-
 			SingleCluster tmpCluster = new SingleCluster(page % 2 == 0,
 					(int) layoutBox.getWidth(), (int) layoutBox.getHeight(),
 					pageNumber);
-
 			clusters.addPageToCluster(tmpCluster, page);
 		}
-
 		// for every cluster create a set of pages on which the preview will
 		// be based
 		for (SingleCluster cluster : clusters.getClusterToPagesMapping().keySet()) {
@@ -92,22 +84,18 @@ class ClusterManager {
 		public void run() {
 			PdfDecoder pdfDecoder = new PdfDecoder(true);
 			try {
-				pdfDecoder
-						.openPdfFile(clusterJob.getSource().getAbsolutePath());
+				pdfDecoder.openPdfFile(clusterJob.getSource().getAbsolutePath());
 			} catch (PdfException e1) {
 				e1.printStackTrace();
 			}
-
-			for (SingleCluster cluster : clusterJob.getClusterCollection()
-					.getAsList()) {
+			for (SingleCluster cluster : clusterJob.getClusterCollection().getAsList()) {
 				for (Integer pageNumber : cluster.getPagesToMerge()) {
 					// TODO jpedal isn't able to render big images
 					// correctly, so let's check if the image is big an
 					// throw it away
 					try {
 						if (cluster.getImageData().isRenderable()) {
-							BufferedImage renderedPage = pdfDecoder
-									.getPageAsImage(pageNumber);
+							BufferedImage renderedPage = pdfDecoder.getPageAsImage(pageNumber);
 							cluster.getImageData().addImageToPreview(renderedPage);
 							workerUnitCounter++;
 						}
@@ -116,7 +104,6 @@ class ClusterManager {
 						e.printStackTrace();
 					}
 				}
-
 			}
 			// now close the reader as it's not used anymore
 			pdfDecoder.closePdfFile();

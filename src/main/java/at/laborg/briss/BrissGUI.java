@@ -390,14 +390,8 @@ public class BrissGUI extends JFrame implements ActionListener,
 		case MAXIMIZE_SIZE:	maximizeSizeInAllRects(); break;
 		case SET_SIZE:		setDefinedSizeSelRects(); break;
 		case SET_POSITION:	setPositionSelRects();    break;
-		case SELECT_ALL:
-			for (MergedPanel mp : mergedPanels)
-				mp.selectAllCrops(true);
-			break;
-		case SELECT_NONE:
-			for (MergedPanel mp : mergedPanels)
-				mp.selectAllCrops(false);
-			break;
+		case SELECT_ALL:	mergedPanels.forEach( mp -> mp.selectAllCrops(true )); 	break;
+		case SELECT_NONE:	mergedPanels.forEach( mp -> mp.selectAllCrops(false));	break;
 		}
 	}
 
@@ -509,9 +503,7 @@ public class BrissGUI extends JFrame implements ActionListener,
 	public void moveSelectedRects(int x, int y) {
 		// move selected rectangles
 		// parameters are relative to current position
-		for (MergedPanel mp : mergedPanels) {
-			mp.selCropsMoveRelative(x, y);
-		}
+		mergedPanels.forEach( mp -> mp.selCropsMoveRelative(x, y) );
 	}
 
 	private static int mm_to_points( int mm  ) { return Math.round( mm  * 72f / 25.4f); }
@@ -544,16 +536,12 @@ public class BrissGUI extends JFrame implements ActionListener,
 		int w;
 		int h;
 		try {
-			w = Integer.parseInt(dims[0]);
-			h = Integer.parseInt(dims[1]);
+			w = mm_to_points( Integer.parseInt(dims[0]) );
+			h = mm_to_points( Integer.parseInt(dims[1]) );
 		} catch (NumberFormatException e) {
 			return;
 		}
-		w = mm_to_points( w );
-		h = mm_to_points( h );
-		for (MergedPanel mp : mergedPanels) {
-			mp.selCropsSetSize(w,h);
-		}
+		mergedPanels.forEach( mp -> mp.selCropsSetSize(w,h) );
 	}
 
 	private void setPositionSelRects() {
@@ -583,23 +571,16 @@ public class BrissGUI extends JFrame implements ActionListener,
 		int x;
 		int y;
 		try {
-			x = Integer.parseInt(dims[0]);
-			y = Integer.parseInt(dims[1]);
+			x = mm_to_points( Integer.parseInt(dims[0]) );
+			y = mm_to_points( Integer.parseInt(dims[1]) );
 		} catch (NumberFormatException e) {
 			return;
 		}
-		x = mm_to_points(x);
-		y = mm_to_points(y);
-		for (MergedPanel mp : mergedPanels) {
-			mp.selCropsMoveAbsolute(x, y);
-		}
+		mergedPanels.forEach( mp -> mp.selCropsMoveAbsolute(x, y) );
 	}
 
-	public void resizeSelectedRects(int w, int h) {
-		// change size of selected rectangles (relative)
-		for (MergedPanel mp : mergedPanels) {
-			mp.selCropsResize(w, h);
-		}
+	public void resizeSelectedRects(int w, int h) { // change size of selected rectangles (relative)
+		mergedPanels.forEach( mp -> mp.selCropsResize(w, h) );
 	}
 
 	public void propertyChange(PropertyChangeEvent evt) {
@@ -620,9 +601,7 @@ public class BrissGUI extends JFrame implements ActionListener,
 	}
 
 	private void EnableConditionalGuiButtons() {
-		for( JMenuItem jmi : conditionalMenuItems ) {
-			jmi.setEnabled(true);
-		}
+		conditionalMenuItems.forEach( jmi -> jmi.setEnabled(true) );
 	}
 
 	private void setStateAfterClusteringFinished(ClusterDefinition newClusters, PageExcludes newPageExcludes, File newSource) {

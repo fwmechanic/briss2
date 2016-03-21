@@ -37,22 +37,19 @@ public class ClusterRenderWorker extends Thread {
 		for (PageCluster cluster : clusters.getClusterList()) {
 			for (Integer pgNum : cluster.getPreviewPgNums()) {
 				// System.out.format( "ClusterRenderWorker: C%d P%d\n", cnum, pgNum );
-				// TODO jpedal isn't able to render big images
-				// correctly, so let's check if the image is big an
-				// throw it away
+				// TODO jpedal isn't able to render big images correctly,
+				// so let's check if the image is big and throw it away
 				try {
 					if (cluster.getImageData().isRenderable()) {
 						cluster.getImageData().addImageToPreview( pdfDecoder.getPageAsImage(pgNum) );
 						workerUnitCounter++;
 					}
-				} catch (PdfException e) {
-					// TODO Auto-generated catch block
+				} catch (PdfException e) { // TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
 			++cnum;
 		}
-		// now close the reader as it's not used anymore
 		pdfDecoder.closePdfFile();
 	}
 }

@@ -6,6 +6,7 @@ import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
+import java.util.stream.IntStream;
 
 public class ClusterImageData {
 
@@ -49,11 +50,11 @@ public class ClusterImageData {
 		int[] tmp = null; // redundant param to disambiguate getPixel() call
 		int height = image.getHeight();
 		int width = image.getWidth();
-		for (int i = 0; i < width; ++i) {
-			for (int j = 0; j < height; ++j) {
+		IntStream.range(0,width).parallel().forEach(i -> {
+			IntStream.range(0,height).parallel().forEach(j -> {
 				imgdata[i][j][imageCnt] = (short) image.getRaster().getPixel(i, j, tmp)[0];
-			}
-		}
+			});
+		});
 		imageCnt++;
 	}
 
@@ -73,28 +74,30 @@ public class ClusterImageData {
 			// so we create an empty image
 			BufferedImage im = new BufferedImage(100, 100, BufferedImage.TYPE_BYTE_BINARY);
 			WritableRaster raster = im.getRaster();
-			for(int h=0;h<100;h++)
-				for(int w=0;w<100;w++)
+			IntStream.range(0,100).parallel().forEach(h -> {
+				IntStream.range(0,100).parallel().forEach(w -> {
 					raster.setSample(w,h,0,1);
+				});
+			});
 			addImageToPreview(im);
 		}
 		BufferedImage outputImage = new BufferedImage(outputImageWidth, outputImageHeight, BufferedImage.TYPE_BYTE_GRAY);
 		WritableRaster raster = outputImage.getRaster().createCompatibleWritableRaster();
 		if (totalImages == 1) {
-			for (int i = 0; i < outputImage.getWidth(); ++i) {
-				for (int j = 0; j < outputImage.getHeight(); ++j) {
+			IntStream.range(0,outputImage.getWidth()).parallel().forEach(i -> {
+				IntStream.range(0,outputImage.getHeight()).parallel().forEach(j -> {
 					raster.setSample(i, j, 0, imgdata[i][j][0]);
-				}
-			}
+				});
+			});
 			outputImage.setData(raster);
 			return outputImage;
 		}
 		int[][] sdvalue = calculateSdOfImages(imgdata, imageCnt);
-		for (int i = 0; i < outputImage.getWidth(); ++i) {
-			for (int j = 0; j < outputImage.getHeight(); ++j) {
+		IntStream.range(0,outputImage.getWidth()).parallel().forEach(i -> {
+			IntStream.range(0,outputImage.getHeight()).parallel().forEach(j -> {
 				raster.setSample(i, j, 0, sdvalue[i][j]);
-			}
-		}
+			});
+		});
 		outputImage.setData(raster);
 		return outputImage;
 	}
@@ -103,7 +106,7 @@ public class ClusterImageData {
 		BufferedImage bdest = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY);
 		Graphics2D g = bdest.createGraphics();
 		AffineTransform at = AffineTransform.getScaleInstance(
-				(double) bdest.getWidth() / bsrc.getWidth(),
+				(double) bdest.getWidth()  / bsrc.getWidth()  ,
 				(double) bdest.getHeight() / bsrc.getHeight());
 		g.drawRenderedImage(bsrc, at);
 		g.dispose();
@@ -133,36 +136,32 @@ public class ClusterImageData {
 		int[][] sum = new int[width][height];
 		int[][] mean = new int[width][height];
 		int[][] sd = new int[width][height];
-		for (int i = 0; i < width; i++) {
-			for (int j = 0; j < height; j++) {
-				for (int k = 0; k < imageCnt; k++) {
+		IntStream.range(0,width).parallel().forEach(i -> {
+			IntStream.range(0,height).parallel().forEach(j -> {
+				IntStream.range(0,imageCnt).forEach(k -> {
 					sum[i][j] += imgdata[i][j][k];
-				}
-			}
-		}
-		for (int i = 0; i < width; i++) {
-			for (int j = 0; j < height; j++) {
+				});
+			});
+		});
+		IntStream.range(0,width).parallel().forEach(i -> {
+			IntStream.range(0,height).parallel().forEach(j -> {
 				mean[i][j] = sum[i][j] / imageCnt;
-			}
-		}
-		for (int i = 0; i < width; i++) {
-			for (int j = 0; j < height; j++) {
+			});
+		});
+		IntStream.range(0,width).parallel().forEach(i -> {
+			IntStream.range(0,height).parallel().forEach(j -> {
 				sum[i][j] = 0;
-			}
-		}
-		for (int i = 0; i < width; i++) {
-			for (int j = 0; j < height; j++) {
-				for (int k = 0; k < imageCnt; k++) {
+				IntStream.range(0,imageCnt).forEach(k -> {
 					sum[i][j] += (imgdata[i][j][k] - mean[i][j])
 							   * (imgdata[i][j][k] - mean[i][j]);
-				}
-			}
-		}
-		for (int i = 0; i < width; i++) {
-			for (int j = 0; j < height; j++) {
+				});
+			});
+		});
+		IntStream.range(0,width).parallel().forEach(i -> {
+			IntStream.range(0,height).parallel().forEach(j -> {
 				sd[i][j] = 255 - (int) Math.sqrt(sum[i][j] / imageCnt);
-			}
-		}
+			});
+		});
 		return sd;
 	}
 }

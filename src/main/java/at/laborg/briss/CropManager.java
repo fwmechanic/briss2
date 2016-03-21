@@ -83,16 +83,12 @@ public class CropManager {
 
 		PdfReader reader = new PdfReader(cropJob.getSource().getAbsolutePath());
 		Document document = new Document();
-
 		File resultFile = File.createTempFile("cropped", ".pdf");
-		PdfSmartCopy pdfCopy = new PdfSmartCopy(document, new FileOutputStream(
-				resultFile));
+		PdfSmartCopy pdfCopy = new PdfSmartCopy(document, new FileOutputStream(resultFile));
 		document.open();
 		PdfImportedPage page;
-
 		for (int pageNumber = 1; pageNumber <= cropJob.getSourcePageCount(); pageNumber++) {
-			SingleCluster currentCluster = cropJob.getClusterCollection()
-					.getSingleCluster(pageNumber);
+			SingleCluster currentCluster = cropJob.getClusterCollection().getSingleCluster(pageNumber);
 			page = pdfCopy.getImportedPage(reader, pageNumber);
 			pdfCopy.addPage(page);
 			for (int j = 1; j < currentCluster.getRatiosList().size(); j++) {
@@ -109,40 +105,29 @@ public class CropManager {
 			throws FileNotFoundException, DocumentException, IOException {
 
 		PdfReader reader = new PdfReader(source.getAbsolutePath());
-		PdfStamper stamper = new PdfStamper(reader, new FileOutputStream(
-				cropJob.getDestinationFile()));
+		PdfStamper stamper = new PdfStamper(reader, new FileOutputStream(cropJob.getDestinationFile()));
 		stamper.setMoreInfo(cropJob.getSourceMetaInfo());
-
 		PdfDictionary pageDict;
 		int newPageNumber = 1;
 		for (int origPageNumber = 1; origPageNumber <= cropJob.getSourcePageCount(); origPageNumber++) {
-			SingleCluster cluster = cropJob.getClusterCollection().getSingleCluster(
-					origPageNumber);
-
+			SingleCluster cluster = cropJob.getClusterCollection().getSingleCluster(origPageNumber);
 			// if no crop was selected do nothing
 			if (cluster.getRatiosList().size() == 0) {
 				newPageNumber++;
 				continue;
 			}
-
 			for (Float[] ratios : cluster.getRatiosList()) {
-
 				pageDict = reader.getPageN(newPageNumber);
-
 				List<Rectangle> boxes = new ArrayList<>();
 				boxes.add(reader.getBoxSize(newPageNumber, "media"));
 				boxes.add(reader.getBoxSize(newPageNumber, "crop"));
 				int rotation = reader.getPageRotation(newPageNumber);
-
-				Rectangle scaledBox = calculateScaledRectangle(boxes, ratios,
-						rotation);
-
+				Rectangle scaledBox = calculateScaledRectangle(boxes, ratios, rotation);
 				PdfArray scaleBoxArray = new PdfArray();
 				scaleBoxArray.add(new PdfNumber(scaledBox.getLeft()));
 				scaleBoxArray.add(new PdfNumber(scaledBox.getBottom()));
 				scaleBoxArray.add(new PdfNumber(scaledBox.getRight()));
 				scaleBoxArray.add(new PdfNumber(scaledBox.getTop()));
-
 				pageDict.put(PdfName.CROPBOX, scaleBoxArray);
 				pageDict.put(PdfName.MEDIABOX, scaleBoxArray);
 				// increment the pagenumber
@@ -150,10 +135,8 @@ public class CropManager {
 			}
 			int[] range = new int[2];
 			range[0] = newPageNumber - 1;
-			range[1] = cropJob.getSourcePageCount()
-					+ (newPageNumber - origPageNumber);
-			SimpleBookmark.shiftPageNumbers(cropJob.getSourceBookmarks(),
-					cluster.getRatiosList().size() - 1, range);
+			range[1] = cropJob.getSourcePageCount() + (newPageNumber - origPageNumber);
+			SimpleBookmark.shiftPageNumbers(cropJob.getSourceBookmarks(), cluster.getRatiosList().size() - 1, range);
 		}
 		stamper.setOutlines(cropJob.getSourceBookmarks());
 		stamper.close();
@@ -187,16 +170,10 @@ public class CropManager {
 
 		// use smallest box as basis for calculation
 		Rectangle scaledBox = new Rectangle(smallestBox);
-
-		scaledBox.setLeft(smallestBox.getLeft()
-				+ (smallestBox.getWidth() * rotRatios[0]));
-		scaledBox.setBottom(smallestBox.getBottom()
-				+ (smallestBox.getHeight() * rotRatios[1]));
-		scaledBox.setRight(smallestBox.getLeft()
-				+ (smallestBox.getWidth() * (1 - rotRatios[2])));
-		scaledBox.setTop(smallestBox.getBottom()
-				+ (smallestBox.getHeight() * (1 - rotRatios[3])));
-
+		scaledBox.setLeft  (smallestBox.getLeft()   + (smallestBox.getWidth()  *      rotRatios[0]));
+		scaledBox.setBottom(smallestBox.getBottom() + (smallestBox.getHeight() *      rotRatios[1]));
+		scaledBox.setRight (smallestBox.getLeft()   + (smallestBox.getWidth()  * (1 - rotRatios[2])));
+		scaledBox.setTop   (smallestBox.getBottom() + (smallestBox.getHeight() * (1 - rotRatios[3])));
 		return scaledBox;
 	}
 
@@ -214,14 +191,10 @@ public class CropManager {
 		}
 		while (rotation > 0 && rotation < 360) {
 			float tmpValue = tmpRatios[0];
-			// left
-			tmpRatios[0] = tmpRatios[1];
-			// bottom
-			tmpRatios[1] = tmpRatios[2];
-			// right
-			tmpRatios[2] = tmpRatios[3];
-			// top
-			tmpRatios[3] = tmpValue;
+			tmpRatios[0] = tmpRatios[1]; // left
+			tmpRatios[1] = tmpRatios[2]; // bottom
+			tmpRatios[2] = tmpRatios[3]; // right
+			tmpRatios[3] = tmpValue;     // top
 			rotation += 90;
 		}
 		return tmpRatios;
