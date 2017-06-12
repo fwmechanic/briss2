@@ -34,7 +34,7 @@ import at.laborg.briss.utils.CropParser;
 
 import com.itextpdf.text.DocumentException;
 
-public final class BrissCMD {
+final class BrissCMD {
 	private BrissCMD() {}
 
 	public static void autoCrop(final String[] args) {

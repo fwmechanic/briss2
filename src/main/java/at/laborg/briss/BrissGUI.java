@@ -19,14 +19,7 @@
  */
 package at.laborg.briss;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Cursor;
-import java.awt.Dialog;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Frame;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
@@ -124,7 +117,7 @@ public class BrissGUI extends JFrame implements ActionListener,
 	private JPanel previewPanel;
 	private JProgressBar progressBar;
 	private List<MergedPanel> mergedPanels = null;
-	private List<JMenuItem> conditionalMenuItems = new ArrayList<>();
+	private final List<JMenuItem> conditionalMenuItems = new ArrayList<>();
 
 	private File lastOpenDir;
 
@@ -235,7 +228,7 @@ public class BrissGUI extends JFrame implements ActionListener,
 		previewPanel = new JPanel();
 		previewPanel.setLayout(new WrapLayout(FlowLayout.LEFT, 4, 4));
 		previewPanel.setEnabled(true);
-		previewPanel.setBackground(Color.BLACK);
+		previewPanel.setBackground(Color.BLUE);
 		previewPanel.addComponentListener(this);
 
 		progressBar = new JProgressBar(0, 100);
@@ -610,7 +603,6 @@ public class BrissGUI extends JFrame implements ActionListener,
 		progressBar.setString("Clustering and Rendering finished");
 		EnableConditionalGuiButtons();
 		setIdleState("");
-		setExtendedState(Frame.MAXIMIZED_BOTH);
 		pack();
 		repaint();
 	}
@@ -631,7 +623,9 @@ public class BrissGUI extends JFrame implements ActionListener,
 		for (PageCluster newCluster : newClusters.getClusterList()) {
 			for (Integer pgNum : newCluster.getMemberPgNums()) {
 				PageCluster oldCluster = oldClusters.getClusterContainingPage(pgNum);
-				oldCluster.getCropRatioList().forEach(newCluster::addCropRatio);
+				if (oldCluster != null) {
+					oldCluster.getCropRatioList().forEach(newCluster::addCropRatio);
+				}
 			}
 		}
 	}
@@ -674,6 +668,9 @@ public class BrissGUI extends JFrame implements ActionListener,
 				} catch (InterruptedException e) {
 				}
 			}
+//			GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
+//			setMaximizedBounds(env.getMaximumWindowBounds());
+			setExtendedState( getExtendedState() | Frame.MAXIMIZED_BOTH );
 			return null;
 		}
 	}

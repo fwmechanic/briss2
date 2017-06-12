@@ -115,12 +115,12 @@ public class SingleCluster implements Comparable<SingleCluster> {
 		return evenPage;
 	}
 
-	public int getRoundedPageHeight() {
+	private int getRoundedPageHeight() {
 		int tmp = pageHeight / MERGE_VARIABILITY;
 		return tmp * MERGE_VARIABILITY;
 	}
 
-	public int getRoundedPageWidth() {
+	private int getRoundedPageWidth() {
 		int tmp = pageWidth / MERGE_VARIABILITY;
 		return tmp * MERGE_VARIABILITY;
 	}

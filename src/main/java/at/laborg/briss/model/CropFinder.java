@@ -13,12 +13,12 @@ public final class CropFinder {
 	private static final int SD_CALC_SIZE_NR = 5;
 	private static final float SD_THRESHOLD_TO_BE_COUNTED = 0.2f;
 
-	public static final int X_AXIS = 0;
-	public static final int Y_AXIS = 1;
-	public static final int ORIENTATION_LEFT = 0;
-	public static final int ORIENTATION_TOP = 1;
-	public static final int ORIENTATION_RIGHT = 2;
-	public static final int ORIENTATION_BOTTOM = 3;
+	private static final int X_AXIS = 0;
+	private static final int Y_AXIS = 1;
+	private static final int ORIENTATION_LEFT = 0;
+	private static final int ORIENTATION_TOP = 1;
+	private static final int ORIENTATION_RIGHT = 2;
+	private static final int ORIENTATION_BOTTOM = 3;
 
 	public static Float[] calcCropRatioOfImg(final BufferedImage image) {
 		WritableRaster raster = image.getRaster();

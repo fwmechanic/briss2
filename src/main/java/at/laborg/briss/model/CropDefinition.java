@@ -40,14 +40,13 @@ public final class CropDefinition {
 
 	public static CropDefinition createCropDefinition(final File source,
 			final File destination, final ClusterDefinition clusters) throws IOException {
-		if (source == null)
+		if (source == null) {
 			throw new IllegalArgumentException("Source must be provided");
-		if (!source.exists())
-			throw new IllegalArgumentException("Source("
-					+ source.getAbsolutePath() + ") file doesn't exist");
-
+		}
+		if (!source.exists()) {
+			throw new IllegalArgumentException("Source(" + source.getAbsolutePath() + ") file doesn't exist");
+		}
 		HashMap<Integer, List<Float[]>> pagesToCrops = new HashMap<>();
-
 		for (PageCluster cluster : clusters.getClusterList()) {
 			for (Integer pageNumber : cluster.getMemberPgNums()) {
 				List<Float[]> cropRectangles = pagesToCrops.get(pageNumber);
@@ -58,11 +57,7 @@ public final class CropDefinition {
 				pagesToCrops.put(pageNumber, cropRectangles);
 			}
 		}
-
-		CropDefinition result = new CropDefinition(source, destination,
-				pagesToCrops);
-
-		return result;
+		return new CropDefinition(source, destination, pagesToCrops);
 	}
 
 	public File getSourceFile() {

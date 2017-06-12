@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.itextpdf.text.Rectangle;
 
-public final class RectangleHandler {
+final class RectangleHandler {
 	private RectangleHandler() {}
 
 	public static Rectangle calculateScaledRectangle(

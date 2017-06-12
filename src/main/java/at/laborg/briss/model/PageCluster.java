@@ -130,7 +130,7 @@ public class PageCluster implements Comparable<PageCluster> {
 		memberPgNums.addAll(other.getMemberPgNums());
 	}
 
-	public final boolean isEvenPages() {
+	private boolean isEvenPages() {
 		return evenPage;
 	}
 

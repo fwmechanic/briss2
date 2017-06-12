@@ -1,6 +1,6 @@
 package at.laborg.briss.model;
 
-public class CropRectangle {
+class CropRectangle {
 	/**
 	 * returns the ratio to crop the page x1,y1,x2,y2, origin = bottom left x1:
 	 * from left edge to left edge of crop rectange y1: from lower edge to lower

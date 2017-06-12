@@ -41,7 +41,7 @@ import com.itextpdf.text.pdf.PdfSmartCopy;
 import com.itextpdf.text.pdf.PdfStamper;
 import com.itextpdf.text.pdf.SimpleBookmark;
 
-public class CropManager {
+class CropManager {
 
 	public static CropJob createCropJob(ClusterJob curClusterJob)
 			throws IOException {

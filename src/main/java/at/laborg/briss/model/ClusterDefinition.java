@@ -41,8 +41,7 @@ public class ClusterDefinition {
 	}
 
 	public final List<List<Float[]>> getAllRatios () {
-		List<List<Float[]>> result = getClusterList().stream().map(cluster -> new ArrayList<>(cluster.getCropRatioList())).collect(Collectors.toList());
-		return result;
+		return getClusterList().stream().map(cluster -> new ArrayList<>(cluster.getCropRatioList())).collect(Collectors.toList());
 	}
 
 	public final void addOrMergeCluster(final PageCluster tmpCluster) {
