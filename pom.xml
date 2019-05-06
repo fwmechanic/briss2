@@ -1,14 +1,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<!-- mvn install:install-file -DgroupId=jpedal -DartifactId=jpedal -Dpackaging=jar -Dversion=4.92b23 -Dfile=/home/gerhard/Downloads/jpedal_lgpl.jar 
-		
-		mvn install:install-file 
-		-DgroupId=javax.media -DartifactId=jai_imageio -Dpackaging=jar -Dversion=1.0 -Dfile=/home/gerhard/Downloads/jai_imageio_idrsolutionsBuild.jar 
-		
-		mvn install:install-file -DgroupId=javax.media -DartifactId=jai_core -Dpackaging=jar -Dversion=1.0 -Dfile=/home/gehrard/Downloads/jai_core.jar 
-		
-		mvn install:install-file -DgroupId=javax.media -DartifactId=jai_codec -Dpackaging=jar -Dversion=1.0 -Dfile=/home/gehrard/Downloads/jai_codec.jar -->
 	<groupId>at.laborg</groupId>
 	<artifactId>briss</artifactId>
 	<version>1.0-rc.1</version>
@@ -41,9 +33,6 @@
 					<target>1.8</target>
 				</configuration>
 			</plugin>
-
-
-
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-assembly-plugin</artifactId>
@@ -57,28 +46,18 @@
 		</plugins>
 	</build>
 
-<repositories>
-<!--
-      <repository>
-	<id>clojars.org</id>
-	<url>http://clojars.org/repo</url>
-      </repository>
--->
-      <repository>
-	<id>oritsh</id>
-	<url>http://www.oritsh.com/nexus/content/repositories/public</url>
-      </repository>
-<!--
-      <repository>
-	<id>globis.ethz.ch</id>
-	<url>http://maven.globis.ethz.ch/archiva/repository/globis-releases</url>
-      </repository>
--->
-      <repository>
-       <id>geotoolkit</id>
-       <url>http://maven.geotoolkit.org/</url>
-      </repository>
-</repositories>
+	<repositories>
+	<!--
+	      <repository>
+		<id>clojars.org</id>
+		<url>http://clojars.org/repo</url>
+	      </repository>
+	      <repository>
+	       <id>geotoolkit</id>
+	       <url>http://maven.geotoolkit.org/</url>
+	      </repository>
+	-->
+	</repositories>
 
 	<dependencies>
 		<dependency>
@@ -94,39 +73,25 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
+			<!-- ***************************************************************
+			 |
+			 | 1. clone https://github.com/Lonzak/JPedal, insert into its pom.xml:
+			 |
+			 |       <repositories>
+			 |               <repository>
+			 |                       <id>mvnrepository.com</id>
+			 |                       <url>http://www.mygrid.org.uk/maven/repository/</url>
+			 |               </repository>
+			 |       </repositories>
+			 |
+			 |    and run `mvn install`.
+			 |
+			 | 2. run (this worktree) `mvn clean package`
+			 |
+			 |-->
 			<groupId>org.jpedal</groupId>
-			<artifactId>jpedal-lgpl</artifactId>
-			<version>4.92b23</version>
-		</dependency>
-<!--
-     ***************************************************************
-	it seems likely that there will not be another release of
-	jpedal-lgpl, therefore the following dependencies, being
-	jpedal-lgpl prerequisites, cannot change
-     ***************************************************************
--->
-		<dependency>
-			<groupId>org.bouncycastle</groupId>
-			<artifactId>bctsp-jdk15</artifactId>
-			<version>1.46</version>
-		</dependency>
-		<dependency>
-			<groupId>javax.media</groupId>
-			<artifactId>jai_imageio</artifactId>
-			<version>1.1.1</version>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>javax.media</groupId>
-			<artifactId>jai_core</artifactId>
-			<version>1.1.3</version>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>javax.media</groupId>
-			<artifactId>jai_codec</artifactId>
-			<version>1.1.3</version>
-			<scope>compile</scope>
+			<artifactId>jpedal_lgpl</artifactId>
+			<version>4.92-p10</version>
 		</dependency>
 	</dependencies>
 	<modules>
