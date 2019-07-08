@@ -71,6 +71,8 @@ import at.laborg.briss.utils.PDFFileFilter;
 import at.laborg.briss.utils.PageNumberParser;
 import at.laborg.briss.utils.CropParser;
 
+import com.itextpdf.text.pdf.PdfReader;
+
 import com.itextpdf.text.DocumentException;
 
 /**
@@ -82,11 +84,17 @@ import com.itextpdf.text.DocumentException;
 public class BrissGUI extends JFrame implements ActionListener,
 		PropertyChangeListener, ComponentListener {
 
-	private static final String EXCLUDE_PAGES_DESCRIPTION = "Enter pages to be excluded from merging (e.g.: \"1-4;6;9\").\n"
-			+ "First page has number: 1\n"
-			+ "If you don't know what you should do just press \"Cancel\"";
-	private static final String SET_SIZE_DESCRIPTION = "Enter size in milimeters (width height)";
-	private static final String SET_POSITION_DESCRIPTION = "Enter position in milimeters (x y)";
+	private static final String EXCLUDE_PAGES_DESCRIPTION =
+		  "Enter sequence of page-ranges separated by ';'\n"
+		+ "A page-range is 'm[,n]' where:\n"
+		+ "   m (and n if present) are decimal page numbers\n"
+		+ "   m,n >= 1, m,n <= last page number, m <= n;\n"
+		+ "   m,n = -1: last page; m,n = -2: next to last page, etc.\n"
+		+ "\n"
+		+ "EX: \"1;3,5;-4,-3;-1\" excludes pages\n"
+		+ "      {1,3,4,5,17,18,20} of a 20-page pdf\n";
+	private static final String SET_SIZE_DESCRIPTION = "Enter size in millimeters (width height)";
+	private static final String SET_POSITION_DESCRIPTION = "Enter position in millimeters (x y)";
 	private static final String LOAD = "Load File";
 	private static final String SET_CROP = "Set Crop Definition";
 	private static final String SHOW_CROP = "Show Crop Definition";
@@ -267,7 +275,7 @@ public class BrissGUI extends JFrame implements ActionListener,
 	}
 
 	private static String lastUserExcludes = "";
-	private static PageExcludes getExcludedPages() {
+	private static PageExcludes getExcludedPages( int numPages ) {
 		String previousInput = lastUserExcludes;
 		// repeat show_dialog until valid input or canceled
 		while (true) {
@@ -276,7 +284,7 @@ public class BrissGUI extends JFrame implements ActionListener,
 			if (input == null || input.equals(""))
 				return null;
 			try {
-				PageExcludes rv = new PageExcludes(PageNumberParser.parsePageNumber(input));
+				PageExcludes rv = new PageExcludes(PageNumberParser.parsePageNumberRanges(input, numPages));
 				lastUserExcludes = input; // got past any ParseExeception, save for next time
 				return rv;
 			} catch (ParseException e) {
@@ -415,16 +423,23 @@ public class BrissGUI extends JFrame implements ActionListener,
 		setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 	}
 
-	void importNewPdfFile(File loadFile) throws IOException, PdfException {
-		// (ab)use of PdfException is admittedly hacky, but I want to preempt wasting
-		// time carefully cropping a file only to find out that it CANNOT be cropped!
-		if( DocumentCropper.isPasswordRequired(loadFile) ) {
+	private static int getNumPages(String fnm) throws IOException, PdfException {
+		// preempt wasting time carefully cropping a file only to learn that the crops CANNOT be saved!
+		PdfReader reader = new PdfReader(fnm);
+		if( reader.isEncrypted() ) {
 			throw new PdfException("Password required to crop source file");
 		}
-		lastOpenDir = loadFile.getParentFile();
+		int rv = reader.getNumberOfPages();
+		reader.close();
+		return rv;
+	}
+
+	void importNewPdfFile(File loadFile) throws IOException, PdfException {
 		previewPanel.removeAll();
 		progressBar.setString("Loading new file - Creating merged previews");
-		ClusterPagesTask clusterTask = new ClusterPagesTask(loadFile, getExcludedPages());
+		lastOpenDir = loadFile.getParentFile();
+		int numPgs = getNumPages(loadFile.getAbsolutePath());
+		ClusterPagesTask clusterTask = new ClusterPagesTask(loadFile, getExcludedPages( numPgs ));
 		clusterTask.addPropertyChangeListener(this);
 		clusterTask.execute();
 	}
@@ -432,7 +447,8 @@ public class BrissGUI extends JFrame implements ActionListener,
 	private void reloadWithOtherExcludes() throws IOException, PdfException {
 		previewPanel.removeAll();
 		progressBar.setString("Reloading file - Creating merged previews");
-		ClusterPagesTask clusterTask = new ClusterPagesTask(workingSet.getSourceFile(), getExcludedPages());
+		int numPgs = getNumPages(workingSet.getSourceFile().getAbsolutePath());
+		ClusterPagesTask clusterTask = new ClusterPagesTask(workingSet.getSourceFile(), getExcludedPages(numPgs));
 		clusterTask.addPropertyChangeListener(this);
 		clusterTask.execute();
 	}

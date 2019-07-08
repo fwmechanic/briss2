@@ -25,64 +25,55 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public final class PageNumberParser {
-
-	
 	private PageNumberParser() {
 	}
 
 	/**
-	 * Super simple page-number parser. It handles entries like: "1-2;34;3-16"
-	 * 
+	 * Page-number-range parser.  See EXCLUDE_PAGES_DESCRIPTION for behavior/spec.
+	 *
 	 * @param input
-	 *            String to be parsed.
+	 *            String to be parsed.  Presumed to contain a sequence of page-number-ranges.
+	 * @param pageCount
+	 *            # of pages in document (used to convert negative pagenums into offset-from-end-of-doc values)
 	 * @return
 	 * @throws ParseException
 	 */
-	public static Set<Integer> parsePageNumber(final String input)
+	public static Set<Integer> parsePageNumberRanges(final String input, final int pageCount)
 			throws ParseException {
 
-		Pattern p = Pattern.compile("[^0-9-;]");
-		Matcher m = p.matcher(input);
-
-		if (m.find())
-			throw new ParseException(
-					"Allowed characters: \"0-9\" \";\" \"-\" ", 0);
-
-		// now tokenize by ;
-		StringTokenizer tokenizer = new StringTokenizer(input, ";");
-
-		Set<Integer> pNS = new HashSet<>();
-		while (tokenizer.hasMoreElements()) {
-			pNS.addAll(extractPageNumbers(tokenizer.nextToken()));
-		}
-
-		return pNS;
-	}
-
-	private static Set<Integer> extractPageNumbers(final String input)
-			throws ParseException {
-
-		StringTokenizer tokenizer = new StringTokenizer(input, "-");
-		Set<Integer> returnSet = new HashSet<>();
-		if (tokenizer.countTokens() == 1) {
-			// it's only a number, lets parse it
-			Integer pageNumber = Integer.parseInt(input);
-			returnSet.add(pageNumber);
-			return returnSet;
-		} else if (tokenizer.countTokens() == 2) {
-			int start = Integer.parseInt(tokenizer.nextToken());
-			int end = Integer.parseInt(tokenizer.nextToken());
-			if (start > end)
-				throw new ParseException("End must be bigger than start in \""
-						+ input + "\"", 0);
-			else {
-				for (int i = start; i <= end; i++) {
-					returnSet.add(i);
-				}
-				return returnSet;
+		// System.out.println("I: "+input);
+		Set<Integer> rv = new HashSet<>();
+		for ( String range : input.split(";+") ) {
+			// System.out.println("R: "+range);
+			final String pgnxs[] = range.split(",");
+			Integer min, max = null;
+			switch( pgnxs.length ) {
+				default: throw new ParseException("range '"+range+"' returned > 2 splits", 0 );
+				case 0:  throw new ParseException("range '"+range+"' returned 0 splits", 0 );
+				case 2:  max = pgnumConv( pgnxs[1], pageCount ); // fall thru
+				case 1:  min = pgnumConv( pgnxs[0], pageCount );
+					 break;
 			}
-		} else
-			throw new ParseException("\"" + input
-					+ "\" has to many - characters!", 0);
+			max = max != null ? max : min;
+			if( max < min ) { throw new ParseException("range '"+range+"' violates m<=n requirement: "+min+" > "+max, 0 ); }
+			for( int ix = min; ix <= max; ++ix ) {
+				// System.out.println("X: "+ix);
+				rv.add( ix );
+			}
+		}
+		return rv;
 	}
+
+	private static Integer pgnumConv( String pgNumIn, final int pageCount )
+			throws ParseException {
+		String inp = pgNumIn.trim();
+		int num = Integer.parseInt(inp);
+		if( num < 0 ) { // negative numbers ref last pages: -1 is last page, -2 is next to last page, etc.
+			num = pageCount + num + 1;
+		}
+		if( num < 1 )         { throw new ParseException("pgNumIn '"+inp+"' ("+num+") is < 1", 0 ); }
+		if( num > pageCount ) { throw new ParseException("pgNumIn '"+inp+"' ("+num+") is > "+pageCount, 0 ); }
+		return num;
+	}
+
 }
