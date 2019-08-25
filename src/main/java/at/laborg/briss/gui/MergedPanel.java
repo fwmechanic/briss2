@@ -434,11 +434,11 @@ public class MergedPanel extends JPanel {
 		public void keyPressed(KeyEvent e) {
 			switch (e.getKeyCode()) {
 			case KeyEvent.VK_C:
-				if (e.getModifiers() == InputEvent.CTRL_MASK) {
+				if ((e.getModifiersEx() & InputEvent.CTRL_DOWN_MASK) != 0) {
 					copyToClipBoard();
 				} break;
 			case KeyEvent.VK_V:
-				if (e.getModifiers() == InputEvent.CTRL_MASK) {
+				if ((e.getModifiersEx() & InputEvent.CTRL_DOWN_MASK) != 0) {
 					pasteFromClipBoard();
 				} break;
 			case KeyEvent.VK_DELETE:	deleteAllSelected(); break;
@@ -454,14 +454,14 @@ public class MergedPanel extends JPanel {
 					case KeyEvent.VK_UP:	y = -1; break;
 					case KeyEvent.VK_DOWN:	y =  1; break;
 				}
-				if ((e.getModifiers() & InputEvent.SHIFT_MASK) != 0) {
+				if ((e.getModifiersEx() & InputEvent.SHIFT_DOWN_MASK) != 0) {
 					x *= 10;
 					y *= 10;
 				}
-				if ((e.getModifiers() & InputEvent.CTRL_MASK) != 0) {
+				if ((e.getModifiersEx() & InputEvent.CTRL_DOWN_MASK) != 0) {
 					briss.resizeSelectedRects(x, y);
 				}
-				else /* if ((e.getModifiers() & InputEvent.ALT_MASK) != 0) */ {
+				else /* if ((e.getModifiersEx() & InputEvent.ALT_DOWN_MASK) != 0) */ {
 					briss.moveSelectedRects(x, y);
 				}
 				e.consume(); // prevent framework from taking further action on these events
