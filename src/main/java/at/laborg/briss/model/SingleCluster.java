@@ -135,7 +135,7 @@ public class SingleCluster implements Comparable<SingleCluster> {
 			float stepWidth = (float) pages.size() / MAX_MERGE_PAGES;
 			float totalStepped = 0;
 			for (int i = 0; i < MAX_MERGE_PAGES; i++) {
-				pagesToMerge.add(pages.get(new Double(Math.floor(totalStepped))
+				pagesToMerge.add(pages.get(Double.valueOf(Math.floor(totalStepped))
 						.intValue()));
 				totalStepped += stepWidth;
 			}
