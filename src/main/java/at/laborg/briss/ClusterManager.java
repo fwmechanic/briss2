@@ -19,6 +19,7 @@ package at.laborg.briss;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 
 import org.jpedal.PdfDecoder;
@@ -36,14 +37,14 @@ class ClusterManager {
 	public static ClusterJob createClusterJob(File origFile)
 			throws IOException, PdfException {
 
-		PdfReader reader = new PdfReader(origFile.getAbsolutePath());
+		PdfReader reader = new PdfReader(new FileInputStream(origFile.getAbsolutePath()));  // https://stackoverflow.com/questions/53301158/itext-java-11-illegal-reflective-access-by-com-itextpdf-io-source-bytebufferran
 		ClusterJob clusterJob = new ClusterJob(origFile);
 		reader.close();
 		return clusterJob;
 	}
 
 	public static void clusterPages(ClusterJob clusterJob) throws IOException {
-		PdfReader reader = new PdfReader(clusterJob.getSource().getAbsolutePath());
+		PdfReader reader = new PdfReader(new FileInputStream(clusterJob.getSource().getAbsolutePath()));  // https://stackoverflow.com/questions/53301158/itext-java-11-illegal-reflective-access-by-com-itextpdf-io-source-bytebufferran
 		ClusterCollection clusters=clusterJob.getClusterCollection();
 		for (int page = 1; page <= reader.getNumberOfPages(); page++) {
 			Rectangle layoutBox = reader.getBoxSize(page, "crop");

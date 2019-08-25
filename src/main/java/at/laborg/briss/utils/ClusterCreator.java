@@ -20,6 +20,7 @@
 package at.laborg.briss.utils;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 
 import at.laborg.briss.model.ClusterDefinition;
@@ -34,7 +35,7 @@ public final class ClusterCreator {
 
 	public static ClusterDefinition clusterPages(final File source,
 			final PageExcludes pageExcludes) throws IOException {
-		PdfReader reader = new PdfReader(source.getAbsolutePath());
+		PdfReader reader = new PdfReader(new FileInputStream(source.getAbsolutePath()));  // https://stackoverflow.com/questions/53301158/itext-java-11-illegal-reflective-access-by-com-itextpdf-io-source-bytebufferran
 		ClusterDefinition clusters = new ClusterDefinition();
 		for (int pgNum = 1; pgNum <= reader.getNumberOfPages(); pgNum++) {
 			// System.out.format( "page %d\n", pgNum );

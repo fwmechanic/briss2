@@ -30,6 +30,7 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.FileInputStream;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -425,7 +426,7 @@ public class BrissGUI extends JFrame implements ActionListener,
 
 	private static int getNumPages(String fnm) throws IOException, PdfException {
 		// preempt wasting time carefully cropping a file only to learn that the crops CANNOT be saved!
-		PdfReader reader = new PdfReader(fnm);
+		PdfReader reader = new PdfReader(new FileInputStream(fnm));  // https://stackoverflow.com/questions/53301158/itext-java-11-illegal-reflective-access-by-com-itextpdf-io-source-bytebufferran
 		if( reader.isEncrypted() ) {
 			throw new PdfException("Password required to crop source file");
 		}

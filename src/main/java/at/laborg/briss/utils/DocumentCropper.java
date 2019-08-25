@@ -19,6 +19,7 @@
 package at.laborg.briss.utils;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -71,7 +72,7 @@ public final class DocumentCropper {
 			final CropDefinition cropDefinition,
 			final PdfMetaInformation pdfMetaInformation) throws IOException, DocumentException {
 
-		PdfReader reader = new PdfReader(cropDefinition.getSourceFile().getAbsolutePath());
+		PdfReader reader = new PdfReader(new FileInputStream(cropDefinition.getSourceFile().getAbsolutePath()));  // https://stackoverflow.com/questions/53301158/itext-java-11-illegal-reflective-access-by-com-itextpdf-io-source-bytebufferran
 		HashMap<String, String> map = SimpleNamedDestination.getNamedDestination(reader, false);
 		Document document = new Document();
 		File resultFile = File.createTempFile("cropped", ".pdf");
@@ -119,7 +120,7 @@ public final class DocumentCropper {
 			final File multipliedDocument,
 			final PdfMetaInformation pdfMetaInformation)
 			throws DocumentException, IOException {
-		PdfReader reader = new PdfReader(multipliedDocument.getAbsolutePath());
+		PdfReader reader = new PdfReader(new FileInputStream(multipliedDocument.getAbsolutePath()));  // https://stackoverflow.com/questions/53301158/itext-java-11-illegal-reflective-access-by-com-itextpdf-io-source-bytebufferran
 		PdfStamper stamper = new PdfStamper(reader, new FileOutputStream(cropDefinition.getDestinationFile()));
 		stamper.setMoreInfo(pdfMetaInformation.getSourceMetaInfo());
 		PdfDictionary pageDict;
@@ -167,7 +168,7 @@ public final class DocumentCropper {
 
 	public static boolean isPasswordRequired(final File file)
 			throws IOException {
-		PdfReader reader = new PdfReader(file.getAbsolutePath());
+		PdfReader reader = new PdfReader(new FileInputStream(file.getAbsolutePath()));  // https://stackoverflow.com/questions/53301158/itext-java-11-illegal-reflective-access-by-com-itextpdf-io-source-bytebufferran
 		boolean isEncrypted = reader.isEncrypted();
 		reader.close();
 		return isEncrypted;
@@ -180,7 +181,7 @@ public final class DocumentCropper {
 		private final List<HashMap<String, Object>> sourceBookmarks;
 
 		public PdfMetaInformation(final File source) throws IOException {
-			PdfReader reader = new PdfReader(source.getAbsolutePath());
+			PdfReader reader = new PdfReader(new FileInputStream(source.getAbsolutePath()));  // https://stackoverflow.com/questions/53301158/itext-java-11-illegal-reflective-access-by-com-itextpdf-io-source-bytebufferran
 			this.sourcePageCount = reader.getNumberOfPages();
 			this.sourceMetaInfo = reader.getInfo();
 			this.sourceBookmarks = SimpleBookmark.getBookmark(reader);

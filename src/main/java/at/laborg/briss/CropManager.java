@@ -19,6 +19,7 @@ package at.laborg.briss;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -47,7 +48,7 @@ class CropManager {
 			throws IOException {
 		File source = curClusterJob.getSource();
 		if (source != null && source.exists()) {
-			PdfReader reader = new PdfReader(source.getAbsolutePath());
+			PdfReader reader = new PdfReader(new FileInputStream(source.getAbsolutePath()));  // https://stackoverflow.com/questions/53301158/itext-java-11-illegal-reflective-access-by-com-itextpdf-io-source-bytebufferran
 			CropJob result = new CropJob(source, reader.getNumberOfPages(),
 					reader.getInfo(), SimpleBookmark.getBookmark(reader));
 			reader.close();
@@ -59,7 +60,7 @@ class CropManager {
 
 	public static CropJob createCropJob(File source) throws IOException {
 		if (source != null && source.exists()) {
-			PdfReader reader = new PdfReader(source.getAbsolutePath());
+			PdfReader reader = new PdfReader(new FileInputStream(source.getAbsolutePath()));  // https://stackoverflow.com/questions/53301158/itext-java-11-illegal-reflective-access-by-com-itextpdf-io-source-bytebufferran
 			CropJob result = new CropJob(source, reader.getNumberOfPages(), reader
 					.getInfo(), SimpleBookmark.getBookmark(reader));
 			reader.close();
@@ -81,7 +82,7 @@ class CropManager {
 	private static File copyToMultiplePages(CropJob cropJob)
 			throws IOException, DocumentException {
 
-		PdfReader reader = new PdfReader(cropJob.getSource().getAbsolutePath());
+		PdfReader reader = new PdfReader(new FileInputStream(cropJob.getSource().getAbsolutePath()));  // https://stackoverflow.com/questions/53301158/itext-java-11-illegal-reflective-access-by-com-itextpdf-io-source-bytebufferran
 		Document document = new Document();
 		File resultFile = File.createTempFile("cropped", ".pdf");
 		PdfSmartCopy pdfCopy = new PdfSmartCopy(document, new FileOutputStream(resultFile));
@@ -104,7 +105,7 @@ class CropManager {
 	private static void cropMultipliedFile(File source, CropJob cropJob)
 			throws FileNotFoundException, DocumentException, IOException {
 
-		PdfReader reader = new PdfReader(source.getAbsolutePath());
+		PdfReader reader = new PdfReader(new FileInputStream(source.getAbsolutePath()));  // https://stackoverflow.com/questions/53301158/itext-java-11-illegal-reflective-access-by-com-itextpdf-io-source-bytebufferran
 		PdfStamper stamper = new PdfStamper(reader, new FileOutputStream(cropJob.getDestinationFile()));
 		stamper.setMoreInfo(cropJob.getSourceMetaInfo());
 		PdfDictionary pageDict;
