@@ -130,7 +130,7 @@
 			 |-->
 			<groupId>org.jpedal</groupId>
 			<artifactId>jpedal_lgpl</artifactId>
-			<version>4.92-p10</version>
+			<version>4.92-p12</version>
 		</dependency>
 	</dependencies>
 	<modules>
