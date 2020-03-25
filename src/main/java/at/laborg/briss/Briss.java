@@ -26,6 +26,12 @@ final class Briss {
 		// this needs to be set in order to cope with jp2000 images
 		System.setProperty("org.jpedal.jai", "true");
 
+		// suppress the following message (including its trailing stack trace)
+		// | Error: Could not find mediaLib accelerator wrapper classes. Continuing in pure Java mode.
+		// | Occurs in: com.sun.media.jai.mlib.MediaLibAccessor
+		// | java.lang.NoClassDefFoundError: com/sun/medialib/mlib/Image
+		System.setProperty("com.sun.media.jai.disableMediaLib", "true");
+
 		// check if args are present, if so try to start commandline briss
 		boolean gui = true;
 		boolean customcrop = false;
